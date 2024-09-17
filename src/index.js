@@ -5,14 +5,13 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import mongoSanitize from 'express-mongo-sanitize'
 import xss from 'xss-clean'
-import router from "./adapters/router/user/authRoute.js";
+import router from './adapters/router/index.js'
 
 import connectToDataBase from './framework/database/connection.js'
 import corsConnection from './framework/web/middlware/corsConnection.js'
 import errorHandler from './framework/web/middlware/errorHandler.js'
 
 dotenv.config(); // Load environment variables from .env
-// import db conection, routes, error handlers
 
 const app = express()
 
@@ -31,7 +30,7 @@ app.use(mongoSanitize())
 connectToDataBase();
 
 // Application routes
-app.use('/auth', router);
+app.use('/', router);
 
 // Handle 404 errors for undefined routes
 app.use('*', (req, res) => {

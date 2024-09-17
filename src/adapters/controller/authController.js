@@ -1,118 +1,184 @@
 import {  signInSchema, signUpSchema, signUpSchemaWithOtp } from "../../entities/authValidator.js";
+import passwordSchema from "../../entities/passwordValidator.js";
 import asyncHandler from "express-async-handler";
-import { handleSignIn, handleSignUp, handleSignUpOtp, resendOtp, getAccessTokenByRefreshToken, getUserFromToken} from '../../usecases/userService.js'
+import userService from '../../usecases/userService.js'
 import AppError from "../../framework/web/utils/appError.js";
 import attachTokenToCookie from "../../framework/web/utils/cookie.js";
 
-  /**
- * @desc user signIn
- * @route  POST /auth/signIn
- * @access public
- */
 
-const handleLogIn = asyncHandler(async (req, res) => {
+export const handleLogIn = asyncHandler(async (req, res) => {
     const { error, value } = signInSchema.validate(req.body);
     if (error) {
       console.log(error);
       throw AppError.validation(error.details[0].message);
     }
-    const { user, accessToken, refreshToken } = await handleSignIn(
+    const { user, accessToken, refreshToken } = await userService.handleSignIn(
       value
     );
-
     attachTokenToCookie("accessToken", accessToken, res);
     attachTokenToCookie("refreshToken", refreshToken, res);
-    console.log("user login successful.user is ", user.name);
-   
+    console.log("Login successful for user - ", user.name);
     res.status(200).json({ message: "Login successfull", user });
-  })
+  });
 
-  /**
- * @desc user signup
- * @route  POST /auth/signup
- * @access public
- */
-const handleRegister = asyncHandler(async (req, res) => {
-
-  const { error, value } = signUpSchema.validate(req.body);
+export const handleRegister = asyncHandler(async (req, res) => {
+  const { error, value } = signUpSchemaWithOtp.validate(req.body);
   if (error) {
     throw AppError.validation(error.details[0].message);
   }
-     
-    const user = await handleSignUp(value);
-
-    console.log(
-      "New User has been registered -",
-      value.name,
-      "with email - ",
-      value.email,
-    );
-   
-    return res.status(200).json({ message: "Account created successfully" });
+  const user = await userService.handleSignUp(value);
+  console.log(
+    "New User has been registered -",
+    value.name,
+    "with email - ",
+    value.email,
+    "with phone number ",
+    value.phone
+  );
+  return res.status(200).json({ message: "Account created successfully" });
   });
 
 
 
-  const handleSignOtp = asyncHandler(async (req, res) => {
-    const {otp,email} = req.body
+export const handleSignOtp = asyncHandler(async (req, res) => {
+  const { error, value } = signUpSchema.validate(req.body);
+  if (error) {
+    throw AppError.validation(error.details[0].message);
+  }
+  const otp = await userService.handleSignUpOtp(value);
+  return res.status(200).json({ message: "Otp send successfully" });
+  })
+
+export const handleForgetPassword = async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await userService.forgetPassword(email);
+      
+      // Assuming you redirect to an OTP page for user to input OTP
+      res.status(200).json({
+        message: "OTP sent to your email",
+        userId: user._id,  // You might use this to track user in session
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(400).json({ error: error.message });
+    }
+  };
+
+  // export const verifyOtp = async (req, res) => {
+  //   const { otp, email } = req.body;
+  //   console.log("Received OTP:", otp);
+  //   console.log("Received Email:", email);
+  //   try {
+  //     // Call a service function to verify the OTP
+  //     const isValid = await userService.verifyOtp(email, otp);
   
-    const data = await handleSignUpOtp(otp,email);
-    return res.status(200).json({ message: "Otp send successfully", success:true });
-  })
+  //     if (isValid) {
+  //       res.status(200).json({ message: "OTP verified successfully." });
+  //     } else {
+  //       res.status(400).json({ message: "Invalid OTP." });
+  //     }
+  //   } catch (err) {
+  //     res.status(500).json({ message: "An error occurred during OTP verification." });
+  //   }
+  // };
 
+  export const handleResetPassword = async (req, res) => {
+    try {
+      console.log(req.body, 'body');
+      
+      // Extract validated values
+      const { email, password } = req.body
 
-  const otpResend = asyncHandler(async (req, res) => {
+      await userService.resetPassword(email, password);
+      console.log(email,'emaillll vannoo');
+      
+      res.status(200).json({ message: "Password reset successful" });
+    } catch (error) {
+      console.error(error.message);
+      res.status(400).json({ error: error.message });
+    }
+  };
 
-    const { email } = req.body;
-
-    const result = await resendOtp(email);
-
-    return res.status(200).json({
-      status: "success",
-      message: "OTP has been resent successfully",
-      data: result,
-    })
-  })
-
-
-  const restoreUserDetails = asyncHandler(async (req, res) => { 
+export const restoreUserDetails = asyncHandler(async (req, res) => { 
     if (!req.cookies["refreshToken"]) {
       return res
         .status(200)
         .json({ message: "refresh token not found", userData: null });
     }
-    const userData = await getUserFromToken(
+    const userData = await userService.getUserFromToken(
       req.cookies["accessToken"]
     );
     if (!userData) {
       res.clearCookie("refreshToken");
       res.clearCookie("accessToken");
     }
-    
     return res.status(200).json({
       message: userData ? "user details found" : "user not found",
       userData,
     });
   });
 
-  const refreshToken = asyncHandler(async (req, res) => {
+
+  export const refreshToken = asyncHandler(async (req, res) => {
     const refreshToken = req.cookies["refreshToken"];
     if (!refreshToken) {
       throw AppError.authentication("provide a refresh token");
     }
-    const accessToken = await getAccessTokenByRefreshToken(
-      refreshToken
-    );
-    attachTokenToCookie("accessToken", accessToken, res);
-  
-    res.status(200).json({ message: "token created successfully" });
+    try{
+      const accessToken = await userService.getAccessTokenByRefreshToken(
+        refreshToken
+      );
+      attachTokenToCookie("accessToken", accessToken, res);
+    
+      res.status(200).json({ accessToken, message: "token created successfully" });
+    }catch(error){
+    console.error("Error refreshing token:", error);
+    return res.status(401).json({ message: error.message });
+    }
   });
 
-  export {
+  export const handleLogout = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies["refreshToken"];
+    if (!refreshToken) console.log("refresh token not present in request");
+  
+    //delete refresh token from database
+    const isTokenPresent = await userService.checkTokenAndDelete(refreshToken);
+    if (!isTokenPresent) console.log("token not present in database");
+  
+    // clear cookie from response
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+  
+    res.status(200).json({ message: "logout successful" });
+  });
+
+  export const loginGoogleAuth = asyncHandler(async (req, res) => {
+    const { email } = req.body
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const data = await userService.googleAuthValidate(email)
+    console.log(data,'google auth data');
+
+    if (data) {
+      res.status(200).json({ message: 'Login successful', token: 'your-generated-token', user: data });
+    } else {
+      res.status(400).json({ message: 'User authentication failed' });
+    }
+  })
+
+  export default {
     handleLogIn,
     handleRegister,
     handleSignOtp,
-    otpResend,
     restoreUserDetails,
-    refreshToken
+    refreshToken,
+    handleLogout,
+    handleForgetPassword,
+    handleResetPassword,
+    loginGoogleAuth,
+    // verifyOtp,
   }

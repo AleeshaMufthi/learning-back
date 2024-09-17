@@ -1,21 +1,51 @@
 import mongoose from "mongoose";
 import userModel from "../model/userModel.js";
+import AppError from "../../framework/web/utils/appError.js";
+import { JWT } from "google-auth-library";
+import { createAccessToken, createRefreshToken } from "../../framework/web/utils/generateTokens.js";
 
 const findUserByEmail = async (email) => {
   try {
-  const data=  await userModel.findOne({ email })
-  return data 
-  } catch (error) {
-    console.log(error);
+    return await userModel.findOne({ email })
+    .select({ 
+      email: 1, 
+      name: 1, 
+      password: 1, 
+      phone: 1 });
+  } catch (err) {
+    console.log("Error querying database for user with email", email, err);
+    throw err; // Or return a default value if you handle errors differently
+  }
+};  
+
+const findUserByPhone = async (phone) => {
+  try {
+    return await userModel.findOne({ phone });
+  } catch (err) {
+    console.log("Error querying database for user with phone", phone, err);
+    throw err;
+  }
+};
+    
+const findUserById = async (_id) => {
+  try {
+    return await userModel.findOne({ _id });
+  } catch (err) {
+    console.log("Error querying database for user with ID", _id, err);
+    throw err; 
   }
 };
 
-const findUserById = async (_id) => await userModel.findOne({ _id });
+const findUserByUserName = async (username) => {
+  try {
+    return await userModel.findOne({ username });
+  } catch (err) {
+    console.log("Error querying database for user with username", username, err);
+    throw err;
+  }
+};
 
-const findByUserName = async (username) =>
-  await userModel.findOne({ username });
-
-const findUserByToken = async (token) => {
+  const findUserByToken = async (token) => {
   const userData = userModel.findOne({ token }).select({
     email: 1,
     name: 1,
@@ -24,25 +54,124 @@ const findUserByToken = async (token) => {
   return userData;
 };
 
-const createUser = async({ name, password, email}) => {
+const checkIsBlocked = async (email) => {
+  const user = await userModel.findOne({ email }).select({ isBlocked: 1 });
+  return user.isBlocked;
+};
+
+const createUser = async ({ name, password, phone, email, username }) => {
   const user = new userModel({
     name,
     email,
+    phone,
     password,
+    username,
   });
 
-  await user.save()
+  return user
+    .save()
+    .then((response) => response)
+    .catch((error) => {
+      console.log("Error saving user data to database - ", error);
+      throw new AppError.database(
+        "An error occured while processing your data"
+      );
+    });
+};
+
+const updatePassword = async ({ email, hashedPassword }) => {
+    try{
+     return await userModel.findOneAndUpdate(
+      {email},
+      {password: hashedPassword},
+      { new: true}
+     )
+    }catch(error){
+      throw new Error("Database error while updating user password")
+    }
 };
 
 const addRefreshTokenById = async (_id, token) => {
-  await User.updateOne({ _id }, { $push: { token } });
+  await userModel.updateOne({ _id }, { $push: { token } });
 };
+
+const findByTokenAndDelete = async (token) => {
+  const isTokenPresent = await userModel.findOneAndUpdate(
+    { token },
+    { $pull: { token } }
+  );
+  return isTokenPresent;
+};
+
+const getAllUser = async () => {
+  const users = await userModel.find();
+  return users;
+};
+
+const blockUserById = async (_id) => {
+  const isBlocked = await userModel.updateOne({ _id }, { isBlocked: true });
+  return isBlocked;
+};
+
+const unblockUserById = async (_id) => {
+  const isBlocked = await userModel.updateOne({ _id }, { isBlocked: false });
+  return isBlocked;
+};
+
+const updateDetailsById = async (user) => {
+  const updatedUser = await userModel.updateOne(
+    { _id: user._id },
+    {
+      name: user.name,
+      age: user.age,
+      about: user.about,
+      address: user.address,
+      visible: user.visible,
+    }
+  );
+  return updatedUser;
+};
+
+const googleAuthUser = async (email) => {
+  try{
+    const user = await userModel.findOne({ email }, { email: 1, name: 1, password: 1, phone: 1, isBlocked: 1 })
+    if(!user){
+      console.log('User not with same email in google account');  
+      throw new Error("User with this email does not exist");
+    }
+    if(user.isBlocked){
+      console.log("Access Denied: User is blocked"); 
+      throw new Error("User is blocked");
+    }
+    const accessToken = createAccessToken(user);
+    const refreshToken = createRefreshToken(user);
+
+    const userInfo = {
+      username: user.name,
+      email: user.email,
+    }
+    return { userInfo, accessToken, refreshToken }  
+
+  }catch(error){
+    throw new Error("Database error while google user authenticating")
+  }
+}
+
 
 export {
   createUser,
-  findUserByEmail, 
+  findUserByEmail,
+  findUserByPhone, 
   findUserById,
-  findByUserName,
+  findUserByUserName,
   findUserByToken,
-  addRefreshTokenById
+  checkIsBlocked,
+  updatePassword,
+  addRefreshTokenById,
+  findByTokenAndDelete,
+  getAllUser,
+  blockUserById,
+  unblockUserById,
+  updateDetailsById,
+  googleAuthUser,
 };

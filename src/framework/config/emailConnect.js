@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 
 // send an email, possibly containing an OTP, to a specified recipient.
-const emailOtp = async (email,otp ) => {
+const emailOtp = async (email, otp ) => {
       return new Promise((resolve, reject) => {
         let transporter = nodemailer.createTransport({
             service: "gmail",

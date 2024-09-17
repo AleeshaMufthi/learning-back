@@ -8,7 +8,8 @@ const comparePasswords = async(plainTextPassword, hashedPassword) => {
 const createHashPassword = async(plainTextPassword) => {
     console.log(plainTextPassword,"jgjgjgg");
     
-    const salt = await bcrypt.genSalt(10)
+    const salt = bcrypt.genSaltSync(10)
+    console.log(salt)
     const hashedPassword = await bcrypt.hash(plainTextPassword, salt)
     return hashedPassword
 }
