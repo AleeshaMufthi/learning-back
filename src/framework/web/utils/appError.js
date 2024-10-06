@@ -20,7 +20,7 @@ class AppError extends Error {
         this.appCode = appCode
         this.statusCode = statusCode
     }
-  /**
+  /**y
    * Creates a new instance of AppError with a specific error code and message.
    * @param {string} [message] - The error message.
    * @returns {AppError} - The new AppError instance.

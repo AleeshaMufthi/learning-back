@@ -15,26 +15,38 @@ const userSchema = new mongoose.Schema(
             required: true
         },
         phone: {
-        type: String,
-        required: true,
-        unique: true,
-      },
+            type: String,
+            required: true,
+            unique: true,
+        },
+        profilePicture: {
+            type: String,
+        },
         username: {
-           type: String,
-           required: true,
-           unique: true,
+            type: String,
+            required: true,
+            unique: true,
         },
         about: String,
+
         age: Number,
+
         address: String,
+
         isBlocked: {
             type: Boolean,
             default: false
         },
+
         token: Array,
+        
+        visible: {
+            type: Boolean,
+            default: true,
+          }
     },{
         timestamps: true,
     }
 )
 
-export default mongoose.model("user", userSchema, "user")
+export default mongoose.model("users", userSchema, "users")

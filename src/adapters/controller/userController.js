@@ -33,6 +33,11 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
     if (error) {
       throw AppError.validation(error.details[0].message);
     }
+
+    if (req.file) {
+      value.profilePicture = req.file.path; // Store the file path (or URL if using a cloud service)
+    }
+    
     const userData = await userService.updateUserDetails({
       ...value,
       _id: req.user._id,

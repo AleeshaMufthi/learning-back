@@ -41,10 +41,19 @@ export const updateTutorDetails = asyncHandler(async (req, res) => {
       .json({ message: "tutor details updated successfully", data: tutorData });
 });
 
+export const getTopTutors = async (req, res) => {
+  const topTutors = await tutorService.getTopTutors();
+  return res.status(200).json({
+    message: "Top tutors found",
+    data: topTutors,
+  });
+};
+
 export default {
     getAllTutors,
     blockTutor,
     unblockTutor,
     getTutorDetails,
     updateTutorDetails,
+    getTopTutors,
 }

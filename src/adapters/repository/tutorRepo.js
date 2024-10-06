@@ -108,6 +108,12 @@ const findTutorByToken = async (token) => {
     return updatedTutor;
   };
 
+
+  const getTutors = async (limit) => {
+    const topTutors = await Tutor.find({}).limit(limit).select("name email");
+    return topTutors;
+  };
+
   
   export {
     createTutor,
@@ -124,5 +130,6 @@ const findTutorByToken = async (token) => {
     blockTutorById,
     unblockTutorById,
     updateDetailsById,
+    getTutors,
   };
   

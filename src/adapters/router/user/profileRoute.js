@@ -4,6 +4,9 @@ import userController from "../../controller/userController.js";
 
 const router = express.Router();
 
-router.route('/').all(isAuthUser).get(userController.getUserDetails).post(userController.updateUserDetails)
+router.route('/')
+      .all(isAuthUser)
+      .get(userController.getUserDetails)
+      .post(userController.updateUserDetails)
 
-export default router
+export default router   

@@ -154,13 +154,13 @@ export const restoreUserDetails = asyncHandler(async (req, res) => {
   });
 
   export const loginGoogleAuth = asyncHandler(async (req, res) => {
-    const { email } = req.body
+    const { email, name } = req.body
 
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
-
-    const data = await userService.googleAuthValidate(email)
+    const userInfo = { email, name}
+    const data = await userService.googleAuthValidate(email, userInfo)
     console.log(data,'google auth data');
 
     if (data) {
@@ -168,7 +168,7 @@ export const restoreUserDetails = asyncHandler(async (req, res) => {
     } else {
       res.status(400).json({ message: 'User authentication failed' });
     }
-  })
+})  
 
   export default {
     handleLogIn,

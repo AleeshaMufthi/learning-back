@@ -39,4 +39,4 @@ const tutorSchema = new mongoose.Schema(
       timestamps: true,
     }
   );
-  export default mongoose.model('tutor', tutorSchema,'tutor'); 
+  export default mongoose.model('tutors', tutorSchema,'tutors'); 

@@ -1,5 +1,5 @@
 import { findOtpByEmail, createOtp, updateOtp } from "../adapters/repository/commonRepo.js";
-import { findTutorByEmail, findTutorByPhone, findTutorById, findTutorByTutorName, findTutorByToken, updatePassword, createTutor, addRefreshTokenById, findByTokenAndDelete, getAllTutor, blockTutorById, unblockTutorById, updateDetailsById } from "../adapters/repository/tutorRepo.js";
+import { findTutorByEmail, findTutorByPhone, findTutorById, findTutorByTutorName, findTutorByToken, updatePassword, createTutor, addRefreshTokenById, findByTokenAndDelete, getAllTutor, blockTutorById, unblockTutorById, updateDetailsById, getTutors } from "../adapters/repository/tutorRepo.js";
 import AppError from "../framework/web/utils/appError.js";
 import verifyToken from "../framework/web/utils/verifyToken.js";
 import { comparePasswords, createHashPassword } from "../framework/web/utils/bcrypt.js";
@@ -189,6 +189,13 @@ export const handleSignIn = async ({ email, password }) => {
     return updatedTutorDetails;
   };
 
+
+  export const getTopTutors = async () => {
+    const limit = 5;
+    const topTutors = await getTutors(limit);
+    return topTutors;
+  };
+
   export default {
     handleSignIn,
     handleSignUp,
@@ -203,4 +210,5 @@ export const handleSignIn = async ({ email, password }) => {
     unblockTutor,
     getTutorDetails,
     updateTutorDetails,
+    getTopTutors,
   }

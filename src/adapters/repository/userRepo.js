@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import userModel from "../model/userModel.js";
 import AppError from "../../framework/web/utils/appError.js";
-import { JWT } from "google-auth-library";
 import { createAccessToken, createRefreshToken } from "../../framework/web/utils/generateTokens.js";
 
 const findUserByEmail = async (email) => {
@@ -119,25 +118,36 @@ const unblockUserById = async (_id) => {
 };
 
 const updateDetailsById = async (user) => {
+  const updateFields = {
+    name: user.name,
+    age: user.age,
+    about: user.about,
+    address: user.address,
+    visible: user.visible,
+  };
+  if (user.profilePicture) {
+    updateFields.profilePicture = user.profilePicture;
+  }
   const updatedUser = await userModel.updateOne(
     { _id: user._id },
-    {
-      name: user.name,
-      age: user.age,
-      about: user.about,
-      address: user.address,
-      visible: user.visible,
-    }
+    { $set: updateFields }
   );
   return updatedUser;
 };
 
-const googleAuthUser = async (email) => {
+const googleAuthUser = async (email, userInfo) => {
   try{
     const user = await userModel.findOne({ email }, { email: 1, name: 1, password: 1, phone: 1, isBlocked: 1 })
     if(!user){
-      console.log('User not with same email in google account');  
-      throw new Error("User with this email does not exist");
+       // User does not exist, create a new user with Google info
+      const newUser = new userModel({
+      name: userInfo.name,
+      email: userInfo.email,
+    })
+
+    await newUser.save();
+    user = newUser
+
     }
     if(user.isBlocked){
       console.log("Access Denied: User is blocked"); 
@@ -146,11 +156,12 @@ const googleAuthUser = async (email) => {
     const accessToken = createAccessToken(user);
     const refreshToken = createRefreshToken(user);
 
-    const userInfo = {
+    const userInfoResponse = {
       username: user.name,
       email: user.email,
-    }
-    return { userInfo, accessToken, refreshToken }  
+    };
+
+    return { userInfo: userInfoResponse, accessToken, refreshToken }  
 
   }catch(error){
     throw new Error("Database error while google user authenticating")

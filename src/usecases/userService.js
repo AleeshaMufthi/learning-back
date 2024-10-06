@@ -221,8 +221,8 @@ export const updateUserDetails = async (userDetails) => {
   return updatedUserDetails;
 };
 
-export const googleAuthValidate = async( email ) => {
-  return await googleAuthUser(email)
+export const googleAuthValidate = async( email, userInfo ) => {
+  return await googleAuthUser(email, userInfo)
 }
 
   export default {

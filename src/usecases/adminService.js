@@ -7,6 +7,7 @@ import generateOtp from '../framework/web/utils/generateOtp.js'
 import { createAccessToken, createRefreshToken } from '../framework/web/utils/generateTokens.js'
 
 export const handleSignIn = async ({ email, password }) => {
+
     let admin = await adminRepository.findAdminByEmail(email);
     console.log(admin,"Adminnn daaataaaa");
     
@@ -22,10 +23,12 @@ export const handleSignIn = async ({ email, password }) => {
   
     const accessToken = createAccessToken(
       adminWithoutPassword,
+      false,  // tutorBool assign to false
+      true    // adminBool assign to true
     );
     const refreshToken = createRefreshToken(adminWithoutPassword);
   
-    // commented until until database refresh token cleanUp is implemented
+    // commented until database refresh token cleanUp is implemented
     await adminRepository.addRefreshTokenById(admin._id, refreshToken);
     return {
       adminData: adminWithoutPassword,
