@@ -33,19 +33,44 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
     if (error) {
       throw AppError.validation(error.details[0].message);
     }
-
-    if (req.file) {
-      value.profilePicture = req.file.path; // Store the file path (or URL if using a cloud service)
-    }
+    console.log(value, "vaaallluueeee");
+    
+     // Check if the file is present
+  if (!req.file) {
+    console.log(req.file,'file not recieved');
+    
+    throw AppError.validation("Thumbnail is required");
+  }
     
     const userData = await userService.updateUserDetails({
       ...value,
       _id: req.user._id,
-    });
+      
+    }, req.file);
     res
       .status(200)
       .json({ message: "user details updated successfully", data: userData });
   });
+
+  export const checkCourseEnrolled = async (req, res) => {
+    console.log(req.user, "reqqqqqqq...........userrrrrrrrrrr")
+    if (!req.user) {
+      return res
+        .status(200)
+        .json({ message: "user is not logged in", enrolled: false });
+    }
+    const params = {
+      courseId: req.params.id,
+      userId: req.user._id,
+    };
+    const isEnrolled = await userService.isEnrolledForCourse(params);
+    return res.status(200).json({
+      message: isEnrolled
+        ? "user is already enrolled for this course"
+        : "user is not enrolled for this course",
+      enrolled: isEnrolled,
+    });
+  };
 
   export default {
     getAllUsers,
@@ -53,4 +78,6 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
     unblockUser,
     getUserDetails,
     updateUserDetails,
+    checkCourseEnrolled,
   }
+

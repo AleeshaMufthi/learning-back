@@ -4,9 +4,13 @@ import createCategorySchema from "../../entities/categoryValidator.js";
 import categoryService from "../../usecases/categoryService.js";
 
 const getAllCategories = asyncHandler(async (req, res) => {
-    const categories = await categoryService.getAllCategories();
-    return res.status(200).json({ message: "Categories Found ", categories });
-  });
+  try {
+      const categories = await categoryService.getAllCategories();
+      return res.status(200).json({ message: "Categories Found", categories });
+  } catch (error) {
+      return res.status(500).json({ message: "Failed to retrieve categories", error: error.message });
+  }
+});
 
 const createCategory = asyncHandler(async (req, res) => {
   console.log("req body",req.body);

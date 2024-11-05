@@ -1,5 +1,6 @@
 import AppError from "../../framework/web/utils/appError.js";
 import Course from "../model/courseModel.js";
+import mongoose from "mongoose";
 
 export const createCourse = async (courseData, tutorId) => {
     const course = new Course({
@@ -31,13 +32,20 @@ export const createCourse = async (courseData, tutorId) => {
   };
 
   export const getCourseById = async (courseId) => {
-    const courses = await Course.findOne({ _id: courseId })
-      .populate("lessons")
-      .populate("tutor", "name")
-      .catch((err) => {
-        console.log(err);
-      });
-    return courses;
+    try {
+
+      console.log(courseId, "corseIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDD");
+      
+      const course = await Course.findOne({ _id: courseId })
+        .populate("lessons")     // Populate the lessons field
+        .populate("tutor"); // Populate the tutor's name field
+  
+      console.log(course, "coursessssssssssssssssssss+++++++++++++++++++++++++++++");
+      return course;
+    } catch (err) {
+      console.log(err);
+      return null;  
+    }
   };
 
   export const addLessonToCourse = async (lessonId, courseId) => {
@@ -49,7 +57,7 @@ export const createCourse = async (courseData, tutorId) => {
   };
 
   export const getAllCourses = async () => {
-    const courses = await Course.find();
+    const courses = await Course.find({ lessons: { $exists: true, $ne: [] } })
     return courses;
   };
 
@@ -86,6 +94,29 @@ export const createCourse = async (courseData, tutorId) => {
     return total;
   };
 
+  export const getCourse=async(courseId)=>{
+    const course=await Course.findById(courseId)
+    return course
+  }
+  
+  const deleteCourseRepo = async (courseId) => {
+    try {
+      const deletedCourse = await Course.findByIdAndDelete(courseId);
+      if (!deletedCourse) {
+        console.log('Course not found for deletion');
+      } else {
+        console.log('Course deleted:', deletedCourse);
+      }
+    } catch (error) {
+      console.error('Error deleting course:', error);
+    }
+  };
+
+  export const updateCourseById = async (id, courseData) => {
+    const updatedCourse =  Course.findByIdAndUpdate(id, courseData, { new: true });
+    return updatedCourse
+  };
+
   export default {
     createCourse,
     getCoursesByTutorId,
@@ -95,7 +126,7 @@ export const createCourse = async (courseData, tutorId) => {
     findCourseById,
     getAllCourseByFilter,
     getCountByFilter,
+    getCourse,
+    deleteCourseRepo,
+    updateCourseById,
   }
- 
-  
-  

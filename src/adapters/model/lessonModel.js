@@ -6,22 +6,26 @@ const lessonSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-        course: {
+        courseId: {
           type: Schema.Types.ObjectId,
           ref: "courses",
+          required: true,
+        },
+        tutor:{
+          type: Schema.Types.ObjectId,
+          ref: "tutors",
           required: true,
         },
         description: {
           type: String,
           required: true,
         },
-        videoKey: {
+        file: {
           type: String,
           required: true,
         },
         duration: {
-          type: Number,
-          required: true,
+          type: Number
         },
         order: {
           type: Number,

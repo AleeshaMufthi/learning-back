@@ -1,56 +1,45 @@
 import courseService from "./courseService.js";
 import lessonRepository from "../adapters/repository/lessonRepo.js";
-import { v2 as cloudinary } from "cloudinary";
+import uploadVideo from "./cloudinaryVideoService.js";
 
-export const addLessonToCourse = async (lesson) => {
-    try {
-      const resourceType = lesson.file.mimetype.startsWith("video") ? "video" : "raw"; // Use "raw" for other file types
-  
-      const uploadResponse = await cloudinary.uploader.upload(lesson.file.path, {
-        resource_type: resourceType,
-        public_id: `lessons/${lesson.title.replace(/ /g, "-")}-${Date.now()}`, // Create a unique public ID
-      });
-  
-      if (!uploadResponse) {
-        console.log("Error while uploading lesson to Cloudinary");
-        return false;
-      }
-  
-      const lessonData = await lessonRepository.addLessonToService(lesson, uploadResponse.public_id);
-  
-      // Add the lesson to the course
-      const data = await courseService.addLessonToCourse(lessonData._id, lesson.data.courseId);
-  
-      if (!data) {
-        console.log("Error while adding lesson to course");
-        return false;
-      }
-  
-      return "success";
-    } catch (error) {
-      console.error("Error in addLessonToCourse:", error);
+  export const addLessonToCourse = async (lesson) => {
+    const lessonKey = await uploadVideo(lesson);
+    if (!lessonKey) {
+      console.log("error while uploading lesson to cloudinary");
       return false;
     }
-  };
+    const lessonDetials={
+      title:lesson.data.title,
+      description:lesson.data.description,
+      courseId:lesson.data.courseId,
+      file:lessonKey,
+      tutor:lesson.tutor._id
+    }
+    const lessonData = await lessonRepository.addLessonToService(
+      lessonDetials
+    );
 
+    const data = await courseService.addLessonToCourse(
+      lessonData._id,
+      lesson.data.courseId
+    );
+
+    if (!data) {
+      console.log("error while adding lesson to course");
+      return false;
+    }
+
+    return  { success: true, lessonData, courseId: lesson.data.courseId };
+  };
   
  export const getLesson = async (lessonId) => {
-    try {
-      let lesson = await lessonRepository.findLessonById(lessonId);
-      lesson = lesson.toObject();
-      
-      // Assuming the lesson has a field `videoKey` which contains the public ID for Cloudinary
-      lesson.videoFormat = lesson.videoKey.split(".")[1];
-  
-      // Constructing the video URL using Cloudinary
-      lesson.videoURL = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/video/upload/${lesson.videoKey}`;
-  
-      return lesson;
-    } catch (error) {
-      console.error("Error in getLesson:", error);
-      throw new Error("Lesson retrieval failed");
-    }
-  };
+  let lesson = await lessonRepository.findLessonById(lessonId);
+    console.log(lesson, 'lessoonnn');
+  lesson = lesson.toObject();
+  lesson.videoFormat = lesson.file.split(".")[1];
+  lesson.videoURL = await uploadVideo(lesson);
+  return lesson;
+};
 
   export default {
     addLessonToCourse,

@@ -1,11 +1,12 @@
 import { createOtp, updateOtp, findOtpByEmail } from '../adapters/repository/commonRepo.js'
-import {createUser, findUserByEmail, findUserByPhone, findUserByUserName, findUserByToken, addRefreshTokenById, findByTokenAndDelete, getAllUser, blockUserById, unblockUserById, findUserById, updateDetailsById, updatePassword, checkIsBlocked, googleAuthUser } from '../adapters/repository/userRepo.js'
+import {createUser, findUserByEmail, findUserByPhone, findUserByUserName, findUserByToken, addRefreshTokenById, findByTokenAndDelete, getAllUser, blockUserById, unblockUserById, findUserById, updateDetailsById, updatePassword, checkIsBlocked, googleAuthUser, getEnrolledCountById, findUserByCourseId } from '../adapters/repository/userRepo.js'
 import emailOtp from '../framework/config/emailConnect.js'
 import AppError from '../framework/web/utils/appError.js'
 import { comparePasswords, createHashPassword } from '../framework/web/utils/bcrypt.js'
 import generateOtp from '../framework/web/utils/generateOtp.js'
 import verifyToken from '../framework/web/utils/verifyToken.js'
 import { createAccessToken, createRefreshToken } from '../framework/web/utils/generateTokens.js'
+import uploadImage from './cloudinaryImgService.js'
 
 
 
@@ -214,9 +215,20 @@ export const getUserDetails = async (userId) => {
   return userDetails;
 };
 
-export const updateUserDetails = async (userDetails) => {
-  const updatedUserDetails = await updateDetailsById(
-    userDetails
+export const updateUserDetails = async (userDetails, file) => {
+  
+  const thumbnailUrl = await uploadImage(file); // Upload the file to Cloudinary
+
+  if (!thumbnailUrl) {
+    console.log('Cloudinary upload failed');
+    
+    throw AppError.database("Error while uploading media file");
+  }
+
+  const updatedUserDetails = await updateDetailsById({
+    userDetails,
+    thumbnail: thumbnailUrl
+  }, { new: true }
   );
   return updatedUserDetails;
 };
@@ -224,6 +236,27 @@ export const updateUserDetails = async (userDetails) => {
 export const googleAuthValidate = async( email, userInfo ) => {
   return await googleAuthUser(email, userInfo)
 }
+
+export const getEnrolledStudentsCount = async (courseId) => {
+  const enrolledStudentsCount = await getEnrolledCountById(
+    courseId
+  );
+  return enrolledStudentsCount;
+};
+
+export const isEnrolledForCourse = async ({ courseId, userId }) => {
+  console.log(userId,'useriddddddddddddddddd')
+  const userData = await findUserByCourseId({
+    courseId,
+    userId,
+  });
+  console.log(userData, 'userrrrDataaa');
+  
+  if (userData) {
+    return true;
+  }
+  return false;
+};
 
   export default {
     handleSignIn,
@@ -240,5 +273,7 @@ export const googleAuthValidate = async( email, userInfo ) => {
     getUserDetails,
     updateUserDetails,
     googleAuthValidate,
+    getEnrolledStudentsCount,
+    isEnrolledForCourse,
     // verifyOtp,
   }

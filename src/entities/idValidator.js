@@ -1,7 +1,6 @@
 import Joi from "joi";
 
-export const objectIdSchema = Joi.string().hex().length(24).required().messages({
+export const objectIdSchema = Joi.string().required().messages({
     "string.empty": "ID is required",
-    "string.length": "Invalid Id",
   });
 

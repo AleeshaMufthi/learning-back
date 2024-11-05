@@ -1,52 +1,54 @@
-import mongoose from "mongoose";
+    import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String
-        },
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        password: {
-            type: String,
-            required: true
-        },
-        phone: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        profilePicture: {
-            type: String,
-        },
-        username: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        about: String,
+    const userSchema = new mongoose.Schema(
+        {
+            name: {
+                type: String
+            },
+            email: {
+                type: String,
+                required: true,
+                unique: true,
+            },
+            password: {
+                type: String,
+                required: true
+            },
+            phone: {
+                type: String,
+                required: true,
+                unique: true,
+            },
+            thumbnail: {
+                type: String,
+            },
+            username: {
+                type: String,
+                required: true,
+                unique: true,
+            },
+            about: String,
 
-        age: Number,
+            age: Number,
 
-        address: String,
+            address: String,
 
-        isBlocked: {
-            type: Boolean,
-            default: false
-        },
+            enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "courses" }],
 
-        token: Array,
-        
-        visible: {
-            type: Boolean,
-            default: true,
-          }
-    },{
-        timestamps: true,
-    }
-)
+            isBlocked: {
+                type: Boolean,
+                default: false
+            },
 
-export default mongoose.model("users", userSchema, "users")
+            token: Array,
+            
+            visible: {
+                type: Boolean,
+                default: true,
+            }
+        },{
+            timestamps: true,
+        }
+    )
+
+    export default mongoose.model("users", userSchema, "users")

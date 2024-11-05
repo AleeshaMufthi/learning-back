@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import userModel from "../model/userModel.js";
 import AppError from "../../framework/web/utils/appError.js";
 import { createAccessToken, createRefreshToken } from "../../framework/web/utils/generateTokens.js";
+// import Orders from "../model/ordersModel.js";
 
 const findUserByEmail = async (email) => {
   try {
@@ -124,10 +125,9 @@ const updateDetailsById = async (user) => {
     about: user.about,
     address: user.address,
     visible: user.visible,
+    thumbnail: user.thumbnail,
   };
-  if (user.profilePicture) {
-    updateFields.profilePicture = user.profilePicture;
-  }
+  
   const updatedUser = await userModel.updateOne(
     { _id: user._id },
     { $set: updateFields }
@@ -168,6 +168,40 @@ const googleAuthUser = async (email, userInfo) => {
   }
 }
 
+const getEnrolledCountById = async (courseId) => {
+  const enrolledStudents = await userModel.countDocuments({
+    enrolledCourses: { $in: [courseId] },
+  });
+  return enrolledStudents;
+};
+
+const findUserByCourseId = async ({ courseId, userId }) =>
+  userModel.findOne({ _id: userId, enrolledCourses: { $in: [courseId] }});
+
+const enrollInCourseById = async ({ courseId, userId }) => {
+  const userData = await userModel.updateOne(
+    { _id: userId },
+    { $addToSet: { enrolledCourses: courseId } }
+  );
+  return userData;
+};
+
+const getCoursesEnrolled = async (userId) => {
+  const coursesEnrolled = await userModel.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+    { $project: { enrolledCourses: 1, _id: 0 } },
+    {
+      $lookup: {
+        from: "courses",
+        localField: "enrolledCourses",
+        foreignField: "_id",
+        as: "details",
+      },
+    },
+    { $project: { details: 1 } },
+  ]);
+  return coursesEnrolled[0].details;
+};
 
 export {
   createUser,
@@ -185,4 +219,8 @@ export {
   unblockUserById,
   updateDetailsById,
   googleAuthUser,
+  getEnrolledCountById,
+  findUserByCourseId,
+  enrollInCourseById,
+  getCoursesEnrolled,
 };

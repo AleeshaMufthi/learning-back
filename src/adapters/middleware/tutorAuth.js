@@ -9,6 +9,7 @@ const isAuthTutor = async (req, res, next) => {
       return res.status(400).json({ err: "token is missing" });
     verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET)
       .then((response) => {
+        console.log("from token verify:",response)
         if (response.user.role !== "tutor") {
           console.log("role is not a tutor");
           return res.status(403).json({ messsage: "Not Authorized" });
