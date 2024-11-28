@@ -27,6 +27,11 @@
                 required: true,
                 unique: true,
             },
+            role: {
+                type: String,
+                enum: ['user', 'tutor', 'admin'],
+                default: 'user'
+            },
             about: String,
 
             age: Number,
