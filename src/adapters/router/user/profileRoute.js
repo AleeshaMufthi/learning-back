@@ -1,6 +1,5 @@
 import express from "express";
 import isAuthUser from "../../middleware/userAuth.js";
-import isAuthOptional from "../../middleware/optionalAuth.js";
 import userController from "../../controller/userController.js";
 import validateParams from "../../middleware/validateParams.js";
 import multer from "multer";
@@ -19,6 +18,6 @@ router
 
 router
   .route("/enrolled/:id/check")
-  .get(validateParams, isAuthOptional, userController.checkCourseEnrolled);
+  .get(validateParams, isAuthUser, userController.checkCourseEnrolled);
 
 export default router;

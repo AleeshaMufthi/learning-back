@@ -27,9 +27,6 @@ export const handleSignIn = async ({ email, password }) => {
       true    // adminBool assign to true
     );
     const refreshToken = createRefreshToken(adminWithoutPassword);
-  
-    // commented until database refresh token cleanUp is implemented
-    await adminRepository.addRefreshTokenById(admin._id, refreshToken);
     return {
       adminData: adminWithoutPassword,
       accessToken,

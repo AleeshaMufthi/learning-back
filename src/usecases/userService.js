@@ -30,7 +30,6 @@ export const handleSignIn = async({ email, password }) => {
   };
 }
 
-
 export const handleSignUp = async ({ name, password, email, phone, otp }) => { 
   try{
     const isEmailOtp = await findOtpByEmail(email);

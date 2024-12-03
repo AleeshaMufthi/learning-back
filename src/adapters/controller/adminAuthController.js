@@ -38,17 +38,15 @@ export const handleSignIn = asyncHandler(async (req, res) => {
   });
 
   export const restoreAdminDetails = asyncHandler(async (req, res) => {
-    if (!req.cookies["accessTokenAdmin"]) {
-      return res
-        .status(200)
-        .json({ message: "access token not found", adminData: null });
-    }
-    const adminData = await adminService.getAdminFromToken(
-      req.cookies["accessTokenAdmin"]
-    );
+   
+    const adminData = req.admin
+    console.log(adminData, "tutordata from the controller");
     if (!adminData) {
-      res.clearCookie("refreshTokenAdmin");
       res.clearCookie("accessTokenAdmin");
+      res.clearCookie("refreshTokenAdmin");
+      return res
+      .status(200)
+      .json({ message: "Invalid token", adminData });
     }
     return res.status(200).json({
       message: adminData ? "admin details found" : "admin not found",

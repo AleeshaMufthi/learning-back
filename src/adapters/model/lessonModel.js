@@ -30,7 +30,6 @@ const lessonSchema = new mongoose.Schema(
         order: {
           type: Number,
         },
-        likes: [{ type: Schema.Types.ObjectId, ref: "users" }],
       },
       {
         timestamps: true,

@@ -1,5 +1,5 @@
 import verifyToken from "../../framework/web/utils/verifyToken.js";
-import { createAccessToken } from "../../framework/web/utils/generateTokens.js";
+import { createAccessToken, createRefreshToken } from "../../framework/web/utils/generateTokens.js";
 import attachTokenToCookie from "../../framework/web/utils/cookie.js";
 import AppError from "../../framework/web/utils/appError.js";
 
@@ -8,23 +8,21 @@ const isAuthUser = async (req, res, next) => {
   const accessToken = req.cookies["accessToken"];
   const refreshToken = req.cookies["refreshToken"];
 
-  if (!accessToken)
-    return res
-      .status(401)
-      .json({ err: "Access Token is missing", name: "TokenMissingError" });
+  if (!refreshToken){
+    return res.status(400).json({ err: "Token is missing",  name: "TokenMissingError" });
+  }
 
   try {
-    const decoded = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
-    console.log(decoded,'********************************************************');
+    const response = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    console.log(response,'response');
     
-    if (decoded.user.role !== "user") {
+    if (response.user.role !== "user") {
       return res.status(403).json({ message: "Not Authorized" });
     }
-    console.log("token verified", response.user.name);
-    req.user = decoded.user;
+    req.user = response.user;
     next();
   } catch (err) {
-    if (err.name === "TokenExpiredError") {
+    if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
       if (!refreshToken) {
         return res
           .status(401)
@@ -32,13 +30,14 @@ const isAuthUser = async (req, res, next) => {
       }
 
       try {
-        const refreshDecoded = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-        if (refreshDecoded.user.role !== "user") {
-          return res.status(403).json({ message: "Not Authorized" });
-        }
-        const newAccessToken = createAccessToken(refreshDecoded.user);
+        const refreshResponse = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        console.log(refreshResponse, 'refresh response');
+        const newAccessToken = createRefreshToken(refreshResponse.user);
+        console.log(newAccessToken, 'new Access token generated');
         attachTokenToCookie("accessToken", newAccessToken, res)
-        req.user = refreshDecoded.user;
+        console.log('attatch token to cookie');
+        
+        req.user = refreshResponse.user;
         next();
       } catch (refreshErr) {
         return res.status(403).json({ err: "Refresh token is invalid or expired"});

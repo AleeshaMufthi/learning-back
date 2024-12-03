@@ -100,39 +100,24 @@ export const handleForgetPassword = async (req, res) => {
   };
 
 export const restoreUserDetails = asyncHandler(async (req, res) => { 
-  const accessToken = req.cookies["accessToken"];
-  if (!accessToken) {
-    return res
-      .status(200)
-      .json({ message: "Access token not found", userData: null });
-  }
   try {
-    const decoded = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
-    const userData = await userService.getUserById(decoded.userId);
+    const userData = req.user
+    console.log(userData, 'user data from controller');
+    
     if (!userData) {
-      res.clearCookie("refreshToken");
       res.clearCookie("accessToken");
+      res.clearCookie("refreshToken"); 
       return res.status(200).json({
         message: "User not found",
-        userData: null
+        userData
       });
     }
     return res.status(200).json({
       message: "User details found",
-      userData: {
-        _id: userData._id,
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone,
-        username: userData.username,
-        role: userData.role
-      }
+      userData
     });
-  } catch (error) {
-    console.error("Error restoring user details:", error);
-    res.clearCookie("refreshToken");
-    res.clearCookie("accessToken");
-    return res.status(401).json({ message: "Authentication failed", error: error.message });
+  } catch (err) {
+    console.error("Error restoring user details:", err);
   }
   });
 

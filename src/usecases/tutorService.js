@@ -40,7 +40,7 @@ export const handleSignIn = async ({ email, password }) => {
   if (!isPasswordMatch) throw AppError.validation("Invalid Password");
 
   const { password: _, ...tutorWithoutPassword } = tutor.toObject();
-  const accessTokenTutor = createAccessToken(tutorWithoutPassword, (tutorBool = true));
+  const accessTokenTutor = createAccessToken(tutorWithoutPassword, true, false);
   const refreshTokenTutor = createRefreshToken(tutorWithoutPassword);
 
   return {
