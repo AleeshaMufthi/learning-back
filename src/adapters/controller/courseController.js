@@ -46,18 +46,16 @@ export const getAllCourseByTutor = async (req, res) => {
 export const getAllCourses = async (req, res) => {
     let query = {
       page: parseInt(req.query.page) - 1 || 0,
-      limit: parseInt(req.query.limit) || 5,
+      limit: parseInt(req.query.limit) || 5, 
       search: req.query.search || "",
       difficulty: req.query.difficulty || "all",
       sort: req.query.sort || "createdAt",
       category: req.query.category || "all",
       reqSort: req.query.sort,
     };
-    console.log(query, "quueeeeeerrrrrryyyyyyyyyyyy");
     
     
     const courses= await courseService.getAllCourses();
-    console.log(courses, 'quuueeerrrryyyyyyyyyy');
     return res
       .status(200)
       .json({ message: "Course found", data: courses });

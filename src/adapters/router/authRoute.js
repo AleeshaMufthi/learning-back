@@ -2,6 +2,7 @@ import express from "express";
 import authController from "../controller/authController.js";
 import tutorAuthController from "../controller/tutorAuthController.js";
 import adminAuthController from "../controller/adminAuthController.js";
+import isAuthTutor from "../middleware/tutorAuth.js";
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.route("/tutor/signup").post(tutorAuthController.handleSignUp);
 router.route("/tutor/sendotp").post(tutorAuthController.handleSignOtp);
 router.route("/tutor/forgetPassword").post(tutorAuthController.handleForgetPassword);
 router.route("/tutor/resetPassword").post(tutorAuthController.handleResetPassword)
-router.route("/tutor/restore").get(tutorAuthController.restoreUserDetails);
+router.route("/tutor/restore").get(isAuthTutor, tutorAuthController.restoreUserDetails);
 router.route("/tutor/token").get(tutorAuthController.refreshToken);
 router.route("/tutor/logout").delete(tutorAuthController.handleLogout);
 

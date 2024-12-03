@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import userModel from "../model/userModel.js";
 import AppError from "../../framework/web/utils/appError.js";
 import { createAccessToken, createRefreshToken } from "../../framework/web/utils/generateTokens.js";
-// import Orders from "../model/ordersModel.js";
 
 const findUserByEmail = async (email) => {
   try {
@@ -14,7 +13,7 @@ const findUserByEmail = async (email) => {
       phone: 1 });
   } catch (err) {
     console.log("Error querying database for user with email", email, err);
-    throw err; // Or return a default value if you handle errors differently
+    throw err; 
   }
 };  
 
@@ -45,13 +44,20 @@ const findUserByUserName = async (username) => {
   }
 };
 
-  const findUserByToken = async (token) => {
-  const userData = userModel.findOne({ token }).select({
-    email: 1,
-    name: 1,
-    isBlocked: 1,
-  });
-  return userData;
+const findUserByUserId = async (userId) => {
+  try {
+    return await userModel.findById(userId)
+      .select({ 
+        email: 1, 
+        name: 1, 
+        phone: 1,
+        username: 1,
+        role: 1
+      });
+  } catch (err) {
+    console.log("Error querying database for user with id", userId, err);
+    throw err;
+  }
 };
 
 const checkIsBlocked = async (email) => {
@@ -65,7 +71,7 @@ const createUser = async ({ name, password, phone, email, username }) => {
     email,
     phone,
     password,
-    username,
+    username
   });
 
   return user
@@ -91,17 +97,8 @@ const updatePassword = async ({ email, hashedPassword }) => {
     }
 };
 
-const addRefreshTokenById = async (_id, token) => {
-  await userModel.updateOne({ _id }, { $push: { token } });
-};
 
-const findByTokenAndDelete = async (token) => {
-  const isTokenPresent = await userModel.findOneAndUpdate(
-    { token },
-    { $pull: { token } }
-  );
-  return isTokenPresent;
-};
+
 
 const getAllUser = async () => {
   const users = await userModel.find();
@@ -209,12 +206,10 @@ export {
   findUserByPhone, 
   findUserById,
   findUserByUserName,
-  findUserByToken,
   checkIsBlocked,
   updatePassword,
-  addRefreshTokenById,
-  findByTokenAndDelete,
   getAllUser,
+  findUserByUserId,
   blockUserById,
   unblockUserById,
   updateDetailsById,

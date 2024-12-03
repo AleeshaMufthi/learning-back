@@ -1,5 +1,5 @@
 import { createOtp, updateOtp, findOtpByEmail } from '../adapters/repository/commonRepo.js'
-import {createUser, findUserByEmail, findUserByPhone, findUserByUserName, findUserByToken, addRefreshTokenById, findByTokenAndDelete, getAllUser, blockUserById, unblockUserById, findUserById, updateDetailsById, updatePassword, checkIsBlocked, googleAuthUser, getEnrolledCountById, findUserByCourseId } from '../adapters/repository/userRepo.js'
+import {createUser, findUserByEmail, findUserByPhone, findUserByUserName, getAllUser, blockUserById, unblockUserById, findUserById, updateDetailsById, updatePassword, checkIsBlocked, googleAuthUser, getEnrolledCountById, findUserByCourseId, findUserByUserId } from '../adapters/repository/userRepo.js'
 import emailOtp from '../framework/config/emailConnect.js'
 import AppError from '../framework/web/utils/appError.js'
 import { comparePasswords, createHashPassword } from '../framework/web/utils/bcrypt.js'
@@ -8,11 +8,7 @@ import verifyToken from '../framework/web/utils/verifyToken.js'
 import { createAccessToken, createRefreshToken } from '../framework/web/utils/generateTokens.js'
 import uploadImage from './cloudinaryImgService.js'
 
-
-
-
 export const handleSignIn = async({ email, password }) => {
-
   let user = await findUserByEmail(email);
   if (!user) throw AppError.validation("Email not registered");
 
@@ -26,9 +22,6 @@ export const handleSignIn = async({ email, password }) => {
 
   const accessToken = createAccessToken(userWithoutPassword);
   const refreshToken = createRefreshToken(userWithoutPassword);
-
-  // commented until until database refresh token cleanUp is implemented
-  await addRefreshTokenById(user._id, refreshToken);
 
   return {
     user: userWithoutPassword,
@@ -159,37 +152,35 @@ export const resetPassword = async ( email, newPassword ) => {
   }
 };
 
+export const getUserById = async(userId) => {
+  return await findUserByUserId(userId)
+}
+
 
 export const getUserFromToken = async (accessToken) => {
-  return verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET)
-    .then(
-      async (data) => await findUserByEmail(data?.user.email)
-    )
-    .catch((err) => {
+  try{
+    const decoded = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    return await findUserByEmail(decoded.email);
+  }
+    catch(err) {
       console.log("error while decoding access token", err);
       return false;
-    });
-};
+    }
+  }
 
 export const getAccessTokenByRefreshToken = async (refreshToken) => {
-  const user = await findUserByToken(refreshToken);
-  if (!user) {
-    throw AppError.authentication("Invalid refresh token! please login again");
+  try {
+    const decoded = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await findUserByUserId(decoded.userId);
+    if (!user) {
+      throw AppError.authentication("Invalid refresh token! Please login again");
+    }
+    const accessToken = createAccessToken(user)
+    return { user, accessToken }
+  } catch (err) {
+    console.log("Error verifying refresh token - ", err);
+    throw AppError.authentication(err.message);
   }
-  return verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-    .then((data) => {
-      const accessToken = createAccessToken(data);
-      return accessToken;
-    })
-    .catch((err) => {
-      console.log("error verifying refresh token - ", err);
-      throw AppError.authentication(err.message);
-    });
-};
-
-export const checkTokenAndDelete = async (token) => {
-  const isTokenPresent = findByTokenAndDelete(token);
-  return isTokenPresent;
 };
 
 export const getAllUsers = async () => {
@@ -264,7 +255,6 @@ export const isEnrolledForCourse = async ({ courseId, userId }) => {
     handleSignUpOtp,
     getUserFromToken,
     getAccessTokenByRefreshToken,
-    checkTokenAndDelete,
     forgetPassword,
     resetPassword,
     getAllUsers,

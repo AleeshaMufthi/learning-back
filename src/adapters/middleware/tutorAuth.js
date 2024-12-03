@@ -1,30 +1,56 @@
 import AppError from "../../framework/web/utils/appError.js";
 import verifyToken from "../../framework/web/utils/verifyToken.js";
+import { createAccessToken, createRefreshToken } from "../../framework/web/utils/generateTokens.js";
+import attachTokenToCookie from "../../framework/web/utils/cookie.js";
 
 const isAuthTutor = async (req, res, next) => {
-    console.log("\n tutor isAuth Middleware accessed");
+
     const accessToken = req.cookies["accessTokenTutor"];
     const refreshToken = req.cookies["refreshTokenTutor"];
-    if (!accessToken && !refreshToken)
-      return res.status(400).json({ err: "token is missing" });
-    verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET)
-      .then((response) => {
-        console.log("from token verify:",response)
-        if (response.user.role !== "tutor") {
-          console.log("role is not a tutor");
-          return res.status(403).json({ messsage: "Not Authorized" });
-        } else {
-          req.tutor = response.user;
-          next();
-        }
-      })
-      .catch((err) => {
-        console.error("token error");
-        if (err?.name == "TokenExpiredError") console.log("token expired");
-        else console.log(err);
+
+    if (!refreshToken){
+      return res.status(400).json({ err: "Token is missing",  name: "TokenMissingError" });
+    }
+
+    try{
+      const response = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET)
+      console.log(response, "response");
+      
+      if (response.user.role !== "tutor") {
         return res.status(403).json({ messsage: "Not Authorized" });
-        throw AppError.authentication(err?.message);
-      });
-  };
+      }
+      
+      req.tutor = response.user;
+      next();   
+    }catch(err){
+      console.log(err, 'err from the middleware==========================');
+      
+      if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
+        if (!refreshToken) {
+          return res.status(401).json({
+            err: "Refresh token is missing",
+            name: "TokenMissingError",
+          });
+    }
+    try{
+      const refreshResponse = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      console.log(refreshResponse, 'refresh response');
+      
+      const newAccessToken = createRefreshToken(refreshResponse.user);
+      console.log(newAccessToken, "new Access token");
+      
+      attachTokenToCookie("accessTokenTutor", newAccessToken, res);
+      console.log(refreshResponse, 'refresh response');
+      
+      req.tutor = refreshResponse.user;
+      next();
+    } catch (refreshErr) {
+      return res.status(403).json({ err: "Refresh token is invalid or expired" });
+    }
+  } else {
+    return res.status(401).json({ err });
+  }
+}
+};
 
   export default isAuthTutor

@@ -5,7 +5,6 @@ import userService from '../../usecases/userService.js'
 import AppError from "../../framework/web/utils/appError.js";
 import attachTokenToCookie from "../../framework/web/utils/cookie.js";
 
-
 export const handleLogIn = asyncHandler(async (req, res) => {
     const { error, value } = signInSchema.validate(req.body);
     if (error) {
@@ -101,52 +100,63 @@ export const handleForgetPassword = async (req, res) => {
   };
 
 export const restoreUserDetails = asyncHandler(async (req, res) => { 
-    if (!req.cookies["refreshToken"]) {
-      return res
-        .status(200)
-        .json({ message: "refresh token not found", userData: null });
-    }
-    const userData = await userService.getUserFromToken(
-      req.cookies["accessToken"]
-    );
+  const accessToken = req.cookies["accessToken"];
+  if (!accessToken) {
+    return res
+      .status(200)
+      .json({ message: "Access token not found", userData: null });
+  }
+  try {
+    const decoded = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
+    const userData = await userService.getUserById(decoded.userId);
     if (!userData) {
       res.clearCookie("refreshToken");
       res.clearCookie("accessToken");
+      return res.status(200).json({
+        message: "User not found",
+        userData: null
+      });
     }
     return res.status(200).json({
-      message: userData ? "user details found" : "user not found",
-      userData,
+      message: "User details found",
+      userData: {
+        _id: userData._id,
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        username: userData.username,
+        role: userData.role
+      }
     });
+  } catch (error) {
+    console.error("Error restoring user details:", error);
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    return res.status(401).json({ message: "Authentication failed", error: error.message });
+  }
   });
 
 
   export const refreshToken = asyncHandler(async (req, res) => {
     const refreshToken = req.cookies["refreshToken"];
+    console.log(refreshToken, 'refresh token in refresh token controller');
+    
     if (!refreshToken) {
-      throw AppError.authentication("provide a refresh token");
+      throw AppError.authentication("Refresh token is missing");
     }
     try{
-      const accessToken = await userService.getAccessTokenByRefreshToken(
+      const { user, accessToken } = await userService.getAccessTokenByRefreshToken(
         refreshToken
       );
       attachTokenToCookie("accessToken", accessToken, res);
-    
-      res.status(200).json({ accessToken, message: "token created successfully" });
+      res.status(200).json({ accessToken, message: "token refresh successfully" });
     }catch(error){
     console.error("Error refreshing token:", error);
-    return res.status(401).json({ message: error.message });
+    return res.status(401).json({message: "Invalid refresh token", name: "AuthenticationError"});
     }
   });
 
   export const handleLogout = asyncHandler(async (req, res) => {
-    const refreshToken = req.cookies["refreshToken"];
-    if (!refreshToken) console.log("refresh token not present in request");
-  
-    //delete refresh token from database
-    const isTokenPresent = await userService.checkTokenAndDelete(refreshToken);
-    if (!isTokenPresent) console.log("token not present in database");
-  
-    // clear cookie from response
     res.clearCookie("refreshToken");
     res.clearCookie("accessToken");
   

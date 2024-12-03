@@ -2,18 +2,24 @@ import mongoose from "mongoose";
 import Tutor from '../model/tutorModel.js'
 import AppError from "../../framework/web/utils/appError.js";
 
-const findTutorByEmail = async (email) =>
-    await Tutor.findOne({ email })
-      .select({
-        email: 1,
-        name: 1,
-        isBlocked: 1,
-        password: 1,
-        phone: 1,
-      })
-      .catch((err) =>
-        console.log("error while quering database for tutor with email", email)
-      );
+const findTutorByEmail = async (email) => {
+  try {
+    const tutor = await Tutor.findOne({ email }).select({
+      email: 1,
+      name: 1,
+      isBlocked: 1,
+      password: 1,
+      phone: 1,
+    });
+    if (!tutor) {
+      console.log("Tutor not found for email:", email);
+    }
+    return tutor;
+  } catch (err) {
+    console.error("Error querying tutor by email:", err);
+    throw err; // Rethrow to propagate the error
+  }
+}
 
 const findTutorByPhone = async (phone) => await Tutor.findOne({ phone });
 
@@ -22,13 +28,17 @@ const findTutorById = async (_id) => await Tutor.findOne({ _id });
 const findTutorByTutorName = async (tutorname) =>
     await Tutor.findOne({ tutorname });
 
-const findTutorByToken = async (token) => {
-    const tutorData = Tutor.findOne({ token }).select({
+const findTutorByToken = async (email) => {
+  try {
+    return await Tutor.findOne({ email }).select({
       email: 1,
       name: 1,
       isBlocked: 1,
     });
-    return tutorData;
+  } catch (err) {
+    console.error("Error querying database for tutor by token:", err);
+    return null; // Return null on error
+  }
   };
 
   const updatePassword = async ({ email, hashedPassword }) => {
@@ -50,6 +60,7 @@ const findTutorByToken = async (token) => {
       phone,
       password,
       tutorname,
+      role: 'tutor',
     });
   
     return tutor

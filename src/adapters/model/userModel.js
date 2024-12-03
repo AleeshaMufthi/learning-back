@@ -19,6 +19,11 @@
                 required: true,
                 unique: true,
             },
+            role: {
+                type: String, 
+                default: "user", 
+                enum: ["user"] ,
+            },
             thumbnail: {
                 type: String,
             },
@@ -26,11 +31,6 @@
                 type: String,
                 required: true,
                 unique: true,
-            },
-            role: {
-                type: String,
-                enum: ['user', 'tutor', 'admin'],
-                default: 'user'
             },
             about: String,
 
@@ -44,8 +44,6 @@
                 type: Boolean,
                 default: false
             },
-
-            token: Array,
             
             visible: {
                 type: Boolean,

@@ -24,6 +24,11 @@ const tutorSchema = new mongoose.Schema(
         required: true,
         unique: true,
       },
+      role: { 
+        type: String, 
+        default: "tutor", 
+        enum: ["tutor"] 
+      },
       about: String,
       age: Number,
       address: String,
@@ -33,7 +38,6 @@ const tutorSchema = new mongoose.Schema(
         type: Boolean,
         default: false,
       },
-      token: Array,
     },
     {
       timestamps: true,

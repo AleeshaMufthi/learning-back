@@ -6,7 +6,6 @@ export const getAllCategories = async () => {
       console.log(err);
       throw AppError.database(err.message);
     });
-    console.log("total categories found - ", categories.length);
     return categories;
   };
 
