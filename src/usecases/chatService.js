@@ -29,6 +29,11 @@ export const fetchEnrolledCourses = async (userId) => {
     }
   };
 
+  export const fetchEnrolledStudents = async (tutorId) => {
+    const data = await chatRepo.fetchStudents(tutorId)
+    return data
+}
+
   export const getStudentMessages = async (userId, tutorId) => {
     const data = await chatRepo.fetchMessagesForStudent(userId, tutorId)
     return data
@@ -55,15 +60,14 @@ export const fetchEnrolledCourses = async (userId) => {
                 return acc
             }, {})
             const sortedData = data.sort((a, b) => new Date(b.Time).getTime() - new Date(a.Time).getTime())
+            
+            console.log(sortedData,'sortedData');
+            console.log(group,'group');
             return { group, sortedData }
         }
         throw new Error('No messages found')
 }
 
-export const fetchEnrolledStudents = async (tutorId) => {
-    const data = await chatRepo.fetchStudents(tutorId)
-    return data
-}
 
 export const instructorMessages = async (tutorId) => {
     const data = await chatRepo.fetchStudents(tutorId)
@@ -75,34 +79,17 @@ export const instructorMessages = async (tutorId) => {
 
 export const fetchInstructorMessages = async (userId, tutorId) => {
   const data = await chatRepo.getInstructorMessages(userId, tutorId)
-  
-  // if (data.length) {
-  //     const group = data.reduce((acc, message) => {
-  //         const senderId = message?.sender?._id
-  //         const recipientId = message?.recipient?._id
-  //         if (!acc['Messages']) {
-  //             acc['Messages'] = []
-  //         }
-  //         acc['Messages'].push({
-  //             text: message.message,
-  //             CurrentUser: senderId === InstructorId.toString(),
-  //             Time: getTimeFromDateTime(message.Time),
-  //             type: message.type
-  //         })
-  //         return acc
-  //     }, {})
-  //     console.log(group, 'this ssssss groupppp');
-      
-      return data
+  console.log(data, 'data from service layer')
+  return data
   }
   
 
 
   export default {
     fetchEnrolledCourses,
+     fetchEnrolledStudents,
     getStudentMessages,
     fetchAllMessages,
-    fetchEnrolledStudents,
     instructorMessages,
     fetchInstructorMessages,
   }

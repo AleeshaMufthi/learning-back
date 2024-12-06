@@ -14,7 +14,6 @@ const isAuthTutor = async (req, res, next) => {
 
     try{
       const response = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET)
-      console.log(response, "response");
       
       if (response.user.role !== "tutor") {
         return res.status(403).json({ messsage: "Not Authorized" });
@@ -23,7 +22,6 @@ const isAuthTutor = async (req, res, next) => {
       req.tutor = response.user;
       next();   
     }catch(err){
-      console.log(err, 'err from the middleware==========================');
       
       if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
         if (!refreshToken) {
@@ -34,13 +32,10 @@ const isAuthTutor = async (req, res, next) => {
     }
     try{
       const refreshResponse = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-      console.log(refreshResponse, 'refresh response');
       
       const newAccessToken = createRefreshToken(refreshResponse.user);
-      console.log(newAccessToken, "new Access token");
       
       attachTokenToCookie("accessTokenTutor", newAccessToken, res);
-      console.log(refreshResponse, 'refresh response');
       
       req.tutor = refreshResponse.user;
       next();

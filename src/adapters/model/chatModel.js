@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
-const chatSchema = new Schema({
+const chatSchema = new Schema(
+  {
     sender: {
         type: Schema.Types.ObjectId,
         refPath: 'senderType',
@@ -32,7 +33,8 @@ const chatSchema = new Schema({
     type:{
         type:String,
         require:true,   
-    }
-})
+    },
+  }
+);
 
-export default mongoose.model("chat", chatSchema, "chat")
+export default mongoose.model("chat", chatSchema, "chat");

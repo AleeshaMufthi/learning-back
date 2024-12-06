@@ -1,6 +1,7 @@
 import courseService from "./courseService.js";
 import lessonRepository from "../adapters/repository/lessonRepo.js";
 import uploadVideo from "./cloudinaryVideoService.js";
+import fetch from "node-fetch";
 
   export const addLessonToCourse = async (lesson) => {
     const lessonKey = await uploadVideo(lesson);
@@ -28,13 +29,11 @@ import uploadVideo from "./cloudinaryVideoService.js";
       console.log("error while adding lesson to course");
       return false;
     }
-
     return  { success: true, lessonData, courseId: lesson.data.courseId };
   };
   
  export const getLesson = async (lessonId) => {
   let lesson = await lessonRepository.findLessonById(lessonId);
-    console.log(lesson, 'lessoonnn');
   lesson = lesson.toObject();
   lesson.videoFormat = lesson.file.split(".")[1];
   lesson.videoURL = await uploadVideo(lesson);

@@ -1,6 +1,8 @@
 import User from "../model/userModel.js";
 import Chat from "../model/chatModel.js";
 import Course from "../model/courseModel.js";
+import messageModel from "../model/messageModel.js";
+import chatModel from "../model/chatModel.js";
 
 export const findCoursesByUserId = async (userId) => {
     try {
@@ -40,6 +42,13 @@ export const findEnrolledStudents = async (courseId) => {
     }
   };
 
+  export const fetchStudents = async (tutorId) => {
+    const courses = await Course.find({ tutor: tutorId }).select('_id') 
+    const courseIds = courses.map(course => course._id)
+    const students = await User.find({ enrolledCourses: { $in: courseIds } })
+    return students
+}
+
   export const fetchMessagesForStudent = async (userId, tutorId) => {
   const data = await Chat.find({
     $or: [
@@ -62,13 +71,6 @@ export const getAllMessages = async (userId, tutorId) => {
     return data
 }
 
-export const fetchStudents = async (tutorId) => {
-    const courses = await Course.find({ tutor: tutorId }).select('_id') 
-    const courseIds = courses.map(course => course._id)
-    const students = await User.find({ enrolledCourses: { $in: courseIds } })
-    return students
-}
-
 export const fetchMessageForInstructor = async (studentIds,tutorId) => {
     const data = await Chat.find({
         $or: [
@@ -86,6 +88,7 @@ export const getInstructorMessages = async (userId, tutorId) => {
         { $and: [{ 'sender': tutorId }, { 'recipient': userId }] }
     ]
 })
+console.log(data, 'data from the repo')
 return data
 }
 

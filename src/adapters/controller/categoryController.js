@@ -13,9 +13,7 @@ const getAllCategories = asyncHandler(async (req, res) => {
 });
 
 const createCategory = asyncHandler(async (req, res) => {
-  console.log("req body",req.body);
     const { value, error } = createCategorySchema.validate(req.body);
-    console.log("valuee",value);
     
     if (error) {
       throw AppError.validation(error.details[0].message);

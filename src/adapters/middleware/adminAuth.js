@@ -14,7 +14,6 @@ const isAuthAdmin = async (req, res, next) => {
 
     try{
     const response = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET)
-    console.log(response, "response");
 
     if (response.user.role !== "admin") {
       return res.status(403).json({ messsage: "Not Authorized" });
@@ -33,13 +32,10 @@ const isAuthAdmin = async (req, res, next) => {
     }
     try{
       const refreshResponse = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-      console.log(refreshResponse, 'refresh response');
 
       const newAccessToken = createRefreshToken(refreshResponse.user);
-      console.log(newAccessToken, "new Access token");
 
       attachTokenToCookie("accessTokenAdmin", newAccessToken, res);
-      console.log(refreshResponse, 'refresh response');
       
       req.admin = refreshResponse.user;
       next();

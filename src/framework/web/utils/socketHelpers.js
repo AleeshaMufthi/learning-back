@@ -1,18 +1,26 @@
 // // import jwt from "jsonwebtoken";
-// import userModel from "../../../adapters/model/userModel.js";
-// import tutorModel from "../../../adapters/model/tutorModel.js";
+import userModel from "../../../adapters/model/userModel.js";
+import tutorModel from "../../../adapters/model/tutorModel.js";
 
-// //  Identify Sender Type
+//  Identify Sender Type
 
-// export const getUserType = async (email)  => {
-//     const student = await userModel.findOne({ email });
-//     if (student) return { userId: student._id, userType: "Users" };
+export const getUserType = async (email)  => {
+    const student = await userModel.findOne({ email });
+    if (student) return { userId: student._id, userType: "Users" };
   
-//     const tutor = await tutorModel.findOne({ email });
-//     if (tutor) return { userId: tutor._id, userType: "Tutors" };
+    const tutor = await tutorModel.findOne({ email });
+    if (tutor) return { userId: tutor._id, userType: "Tutors" };
   
-//     return null; // Return null if the user is not found in either collection
-//   }
+    return null;
+  }
+
+//   export const saveMessageToDatabase = async (roomId, sender, recipient, message, Time, type) => {
+
+//   const newChat = await chatModel.create({ roomId: _id, sender, recipient, message, Time, type})
+//   console.log(newChat, 'new chat');
+  
+//   return newChat
+// }
 
 
 
@@ -39,10 +47,4 @@
 // //     } catch (error) {
 // //         throw new Error('Invalid token');
 // //     }
-// // }
-
-// // export const saveMessageToDatabase = async (sender, recipient, message, Time, type) => {
-
-// //     const newChat = await chatModel.create({ sender, recipient, message, Time, type})
-// //     return newChat
 // // }

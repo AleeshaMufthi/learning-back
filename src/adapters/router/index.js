@@ -6,14 +6,17 @@ import userCourseRoute from './user/courseRoute.js'
 import userLessonRoute from './user/lessonRoute.js'
 import userOrdersRoute from './user/orderRoute.js'
 import userWalletRoute from './user/walletRoute.js'
+import userChatRoute from './user/chatRoute.js'
 
 import tutorDetailsRoute from './tutor/profileRoute.js'
 import tutorCourseRoute from './tutor/courseRoute.js'
 import tutorLessonRoute from './tutor/lessonRoute.js'
+import tutorChatRoute from './tutor/chatRoute.js'
 
 import adminUserRoute from './admin/usersRoute.js'
 import adminTutorRoute from './admin/TutorsRoute.js'
 import adminCategoryRoute from './admin/categoryRoute.js'
+import { path } from "@ffmpeg-installer/ffmpeg";
 
 const router = express.Router()
 
@@ -43,6 +46,10 @@ const defaultRoutes = [
         route: userWalletRoute,
     },
     {
+        path: "/user/chat",
+        route: userChatRoute,
+    },
+    {
         path: '/tutor/details',
         route: tutorDetailsRoute
     },
@@ -53,6 +60,10 @@ const defaultRoutes = [
     {
         path: "/tutor/lessons",
         route: tutorLessonRoute,
+    },
+    {
+        path: "/tutor/chat",
+        route: tutorChatRoute,
     },
     {
         path: '/admin/users',

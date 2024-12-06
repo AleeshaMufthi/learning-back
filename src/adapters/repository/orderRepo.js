@@ -27,8 +27,7 @@ export const findOrdersByUserId = async (userId) =>
 
       export const findOrderById = async (orderId) => {
         try {
-          const order = await Orders.findById(orderId);
-          console.log('Order fetched from DB:', order);  // Log the order fetched from DB
+          const order = await Orders.findById(orderId); // Log the order fetched from DB
           return order;
         } catch (error) {
           console.error('Error fetching order from DB:', error.message);

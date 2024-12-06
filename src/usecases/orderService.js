@@ -43,20 +43,16 @@ export const createOrder = async ({ courseId, userId, user }) => {
     if (!orders.length) {
       console.log("no transaction found for the user :", userId);
     }
-    console.log("total orders by users:", userId);
     return orders;
   };
 
   export const cancelOrder = async (orderId) => {
     try {
-      console.log('Canceling order with ID:', orderId);  // Log the order ID for debugging
   
       const order = await orderRepository.findOrderById(orderId);
       if (!order) {
         throw new CustomError(404, "Order not found");
       }
-  
-      console.log('Order found:', order);  // Log the found order
   
       // Check if the order is within 7 days
       const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
@@ -69,7 +65,6 @@ export const createOrder = async ({ courseId, userId, user }) => {
   
       await orderRepository.updateOrderStatus(orderId, 'canceled');
       await orderRepository.updateOrderEnrolledStatus(orderId, false);
-      console.log('Order updated to canceled:'); 
 
       const updatedOrder = await orderRepository.findOrderById(orderId);
   

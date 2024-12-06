@@ -81,12 +81,10 @@ export const handleSignUp = async ({ name, password, email, phone, otp }) => {
 export const handleSignUpOtp = async({ email, phone }) => {
 try{
   const isEmailTaken = await findUserByEmail(email);
-  console.log(isEmailTaken,'isEmailtaken'); 
   if (isEmailTaken) {
     throw AppError.conflict("Email is already taken");
   }
   const isPhoneTaken = await findUserByPhone(phone);
-  console.log(isPhoneTaken,'isPhoneTaken'); 
   if (isPhoneTaken) {
     throw AppError.conflict("Phone Number is already taken");
   }
@@ -235,12 +233,10 @@ export const getEnrolledStudentsCount = async (courseId) => {
 };
 
 export const isEnrolledForCourse = async ({ courseId, userId }) => {
-  console.log(userId,'useriddddddddddddddddd')
   const userData = await findUserByCourseId({
     courseId,
     userId,
   });
-  console.log(userData, 'userrrrDataaa');
   
   if (userData) {
     return true;

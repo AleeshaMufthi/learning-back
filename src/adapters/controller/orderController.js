@@ -44,12 +44,9 @@ export const createOrder = asyncHandler(async (req, res) => {
     const { orderId } = req.body;
     try {
       const order = await orderService.cancelOrder(orderId); 
-      console.log(order, "order from canceloooorrderrrrrrr");
-      console.log(order.price, "order.priceeeeeeeeeeeee");
       
       
       const wallet = await walletService.creditWallet(req.user._id, order.price);
-      console.log(wallet, "wallettttttttttttttttt");
       
       res.status(200).json({ message: "Order canceled and refund credited", balance: wallet.balance, order });
     } catch (error) {

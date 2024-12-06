@@ -84,13 +84,11 @@ export const handleForgetPassword = async (req, res) => {
 
   export const handleResetPassword = async (req, res) => {
     try {
-      console.log(req.body, 'body');
       
       // Extract validated values
       const { email, password } = req.body
 
       await userService.resetPassword(email, password);
-      console.log(email,'emaillll vannoo');
       
       res.status(200).json({ message: "Password reset successful" });
     } catch (error) {
@@ -102,7 +100,6 @@ export const handleForgetPassword = async (req, res) => {
 export const restoreUserDetails = asyncHandler(async (req, res) => { 
   try {
     const userData = req.user
-    console.log(userData, 'user data from controller');
     
     if (!userData) {
       res.clearCookie("accessToken");
@@ -124,7 +121,6 @@ export const restoreUserDetails = asyncHandler(async (req, res) => {
 
   export const refreshToken = asyncHandler(async (req, res) => {
     const refreshToken = req.cookies["refreshToken"];
-    console.log(refreshToken, 'refresh token in refresh token controller');
     
     if (!refreshToken) {
       throw AppError.authentication("Refresh token is missing");
@@ -156,7 +152,6 @@ export const restoreUserDetails = asyncHandler(async (req, res) => {
     }
     const userInfo = { email, name}
     const data = await userService.googleAuthValidate(email, userInfo)
-    console.log(data,'google auth data');
 
     if (data) {
       res.status(200).json({ message: 'Login successful', token: 'your-generated-token', user: data });

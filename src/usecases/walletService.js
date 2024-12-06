@@ -10,7 +10,6 @@ export const getWalletBalance = async (userId) => {
   
   export const creditWallet = async (userId, amount) => {
     try {
-      console.log(amount, "amounttttttttttttttttttttttttttt");
       
       // Ensure amount is a valid number
       if (isNaN(amount) || amount <= 0) {

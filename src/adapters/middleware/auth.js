@@ -33,7 +33,6 @@ const isAuth = async (req, res, next) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
           });
-          console.log("New access token generated", refreshResponse.user.name);
           req.user = refreshResponse.user;
           next();
         } catch (refreshErr) {

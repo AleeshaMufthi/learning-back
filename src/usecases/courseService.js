@@ -46,7 +46,6 @@ export const getAllCourseByTutor = async (tutorId) => {
 
 export const getCourseDetails = async (courseId) => {
     let course = await courseRepository.getCourseById(courseId);
-    console.log(course, 'courseeeeee');
     if(course){
       course = course.toObject();
     
@@ -142,7 +141,6 @@ export const getEnrolledCourses = async (userId) => {
       secure: true, 
     });
   }  
-  console.log(coursesEnrolled,"==================================");
   
   return coursesEnrolled;
 };

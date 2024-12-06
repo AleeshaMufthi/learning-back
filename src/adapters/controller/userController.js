@@ -33,11 +33,9 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
     if (error) {
       throw AppError.validation(error.details[0].message);
     }
-    console.log(value, "vaaallluueeee");
     
      // Check if the file is present
   if (!req.file) {
-    console.log(req.file,'file not recieved');
     
     throw AppError.validation("Thumbnail is required");
   }
@@ -53,7 +51,6 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
   });
 
   export const checkCourseEnrolled = async (req, res) => {
-    console.log(req.user, "reqqqqqqq...........userrrrrrrrrrr")
     if (!req.user) {
       return res
         .status(200)

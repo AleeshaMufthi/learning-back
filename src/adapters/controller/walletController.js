@@ -10,7 +10,6 @@ export const getWalletBalance = async (req, res) => {
   };
 
 export const creditWallet = async (req, res) => {
-  console.log(req.body,"req.bodyyyyyyyyyyyyyy")
     const { amount } = req.body;
     if (!amount || amount <= 0) {
       return res.status(400).json({ error: "Invalid amount" });

@@ -24,7 +24,7 @@ export const handleSignIn = asyncHandler(async (req, res) => {
       throw AppError.validation(error.details[0].message);
     }
     const admin = await adminService.handleSignUp(value);
-    console.log("signed in");
+    console.log("Admin signed in");
     return res.status(200).json({ message: "Account created successfully" });
   });
 
@@ -40,7 +40,6 @@ export const handleSignIn = asyncHandler(async (req, res) => {
   export const restoreAdminDetails = asyncHandler(async (req, res) => {
    
     const adminData = req.admin
-    console.log(adminData, "tutordata from the controller");
     if (!adminData) {
       res.clearCookie("accessTokenAdmin");
       res.clearCookie("refreshTokenAdmin");

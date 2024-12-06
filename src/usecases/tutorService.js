@@ -149,7 +149,6 @@ export const getTutorFromToken = async (accessTokenTutor) => {
       accessTokenTutor,
       process.env.ACCESS_TOKEN_SECRET
     );
-    console.log("Decoded token:", decoded);
     return await findTutorByEmail(decoded.user.email);
   } catch (err) {
     if (err.name === "TokenExpiredError") {
@@ -173,7 +172,6 @@ export const getAccessTokenByRefreshToken = async (refreshTokenTutor) => {
     throw AppError.authentication("Invalid refresh token! please login again");
   }
   const accessTokenTutor = createAccessToken(tutor);
-  console.log(accessTokenTutor, "+======----0-0-983ejhcbbskmnxkkisjk");
 
   return accessTokenTutor;
 };

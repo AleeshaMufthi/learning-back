@@ -59,13 +59,11 @@ export const handleForgetPassword = async (req, res) => {
 
 export const handleResetPassword = async (req, res) => {
   try {
-    console.log(req.body, "body");
 
     // Extract validated values
     const { email, password } = req.body;
 
     await tutorService.resetPassword(email, password);
-    console.log(email, "emaillll vannoo");
     res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.error(error.message);
@@ -76,7 +74,6 @@ export const handleResetPassword = async (req, res) => {
 export const restoreUserDetails = asyncHandler(async (req, res) => {
   try {
     const tutorData = req.tutor;
-    console.log(tutorData, "tutordata from the controller");
 
     if (!tutorData) {
       res.clearCookie("accessTokenTutor");
@@ -123,7 +120,6 @@ export const restoreUserDetails = asyncHandler(async (req, res) => {
 
 export const refreshToken = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies["refreshTokenTutor"];
-  console.log(refreshToken, "refresh token from the tutor/token");
 
   if (!refreshToken) {
     throw AppError.authentication("provide a refresh token");
@@ -131,7 +127,6 @@ export const refreshToken = asyncHandler(async (req, res) => {
   const accessToken = await tutorService.getAccessTokenByRefreshToken(
     refreshToken
   );
-  console.log(accessToken, "access token from the tutor/token");
 
   attachTokenToCookie("accessTokenTutor", accessToken, res);
 

@@ -7,31 +7,21 @@ import courseService from '../../usecases/courseService.js'
 import userService from '../../usecases/userService.js'
 
 export const handleCourseCreate = asyncHandler(async (req, res) => {
-  console.log(req.body,'req.body');
   
   const { value, error } = createCourseSchema.validate(req.body);
-  console.log(req.body,'validate req.body');
   
   if (error) {
-    console.log(error,'erroorrrr');
     
     throw AppError.validation(error.details[0].message);
   }
 
   // Check if the file is present
   if (!req.file) {
-    console.log(req.file,'file not recieved');
     
     throw AppError.validation("Thumbnail is required");
   }
 
   const course = await courseService.courseCreate(req.file, value, req.tutor);
-  console.log(req.file,'req.fileee');
-  console.log(value,'valueeee');
-  console.log(req.tutor, 'req.tutor');
-  
-  
-  
   return res.status(200).json({ message: "course created successfully" });
 });
 
@@ -64,18 +54,14 @@ export const getAllCourses = async (req, res) => {
   export const courseDetials=async(req,res)=>{
     const {id}=req.params
     const data=await courseService.getOneCourseDetials(id)
-    console.log(data)
     return res.status(200).json({message:"get course",data})
   }
 
   export const getSpecificCourse = async (req, res) => {
-    console.log(req.params, "req..............paraammsss");
-    const course = await courseService.getCourseDetails(req.params.id); 
-    console.log(course, "couse from controllerrrrrrrrrrrrrrrrrr");
+    const course = await courseService.getCourseDetails(req.params.id);
     const totalStudentsEnrolled = await userService.getEnrolledStudentsCount(
       req.params.id
     );
-    console.log(totalStudentsEnrolled, "Total students enrolled");
     course.totalStudentsEnrolled = totalStudentsEnrolled;
     res.status(200).json({ message: "course Found", data: course });
   };
@@ -96,7 +82,6 @@ export const getAllCourses = async (req, res) => {
 
   export const getEnrolledCourses = async (req, res) => {    
     const enrolledCourses = await courseService.getEnrolledCourses(req.user._id);
-    console.log(enrolledCourses);
     
     return res.status(200).json({ message: "success", data: enrolledCourses });
   };
@@ -107,7 +92,6 @@ export const getAllCourses = async (req, res) => {
       userId: req.user._id,
     };
     const isEnrolled = await userService.isEnrolledForCourse(params);
-    console.log(`Isssssssssssssss Enrolled: ${isEnrolled}`);
     if (isEnrolled) {
       next();
       return;
@@ -116,8 +100,6 @@ export const getAllCourses = async (req, res) => {
   };
 
   const deleteCourseController = async (req, res) => {
-    console.log(req.params,'req.paraammsss');
-    console.log(req.params.id,'req.paraammsss.iiddd');
 
     const { id: courseId } = req.params;
     try {
@@ -134,12 +116,9 @@ export const getAllCourses = async (req, res) => {
 
   export const updateCourse = async (req, res, next) => {
     try {
-      console.log(req.params.id,"reqqqqqqqqqqqqqq.params.iddddddddd");
-      console.log(req.body, "req.bodyyyyyyyyyyyyyyyyyyyyyyyyyyy");
       const courseId = req.params.id;
       const courseData = req.body;
       const updatedCourse = await courseService.updateCourse(courseId, courseData);
-      console.log(updatedCourse, "updated courseeeeeeeee");
       
       res.status(200).json({ data: updatedCourse });
     } catch (error) {

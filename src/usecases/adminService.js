@@ -9,7 +9,6 @@ import { createAccessToken, createRefreshToken } from '../framework/web/utils/ge
 export const handleSignIn = async ({ email, password }) => {
 
     let admin = await adminRepository.findAdminByEmail(email);
-    console.log(admin,"Adminnn daaataaaa");
     
     if (!admin) throw AppError.validation("Email not registered");
   

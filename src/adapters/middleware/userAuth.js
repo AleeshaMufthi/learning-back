@@ -14,7 +14,6 @@ const isAuthUser = async (req, res, next) => {
 
   try {
     const response = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
-    console.log(response,'response');
     
     if (response.user.role !== "user") {
       return res.status(403).json({ message: "Not Authorized" });
@@ -31,11 +30,8 @@ const isAuthUser = async (req, res, next) => {
 
       try {
         const refreshResponse = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-        console.log(refreshResponse, 'refresh response');
         const newAccessToken = createRefreshToken(refreshResponse.user);
-        console.log(newAccessToken, 'new Access token generated');
         attachTokenToCookie("accessToken", newAccessToken, res)
-        console.log('attatch token to cookie');
         
         req.user = refreshResponse.user;
         next();

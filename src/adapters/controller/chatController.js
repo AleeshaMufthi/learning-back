@@ -11,6 +11,17 @@ export const onFetchEnrolledCourses = async(req, res) => {
     }
   }
 
+  export const onFetchEnrolledStudents = async (req, res) => {
+    try {
+        const tutorId = req.tutor._id
+        const data = await chatService.fetchEnrolledStudents(tutorId)
+        return res.status(200).json({message: "fetch enrolled students", data})
+
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
   export const onGetStudentMessages = async(req, res) => {
 
     try {
@@ -38,17 +49,6 @@ export const onFetchEnrolledCourses = async(req, res) => {
     }
   }
 
-  export const onFetchEnrolledStudents = async (req, res) => {
-    try {
-        const tutorId = req.tutor._id
-        const data = await chatService.fetchEnrolledStudents(tutorId)
-        return res.status(200).json({message: "fetch enrolled students", data})
-
-    } catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-}
-
 export const onGetInstructorMessages = async (req, res) => {
     try {
         const tutorId = req.tutor._id
@@ -65,8 +65,12 @@ export const onFetchInstructorMessages = async (req, res) => {
   try {
       const userId = req.params.id
       const tutorId = req.tutor._id
+      console.log(userId, tutorId, 'userId and tutorId from the cntrllr')
       const data = await chatService.fetchInstructorMessages(userId, tutorId)
-      res.status(200).json(data)
+
+      console.log(data, 'data from fetch instructor messages');
+      
+      return res.status(200).json({message: "Get instructor messages", data})
   } catch (error) {
       res.status(400).json({ message: error.message })
   }
@@ -74,9 +78,9 @@ export const onFetchInstructorMessages = async (req, res) => {
 
   export default {
     onFetchEnrolledCourses,
+    onFetchEnrolledStudents,
     onGetStudentMessages,
     onFetchAllMessages,
-    onFetchEnrolledStudents,
     onGetInstructorMessages,
     onFetchInstructorMessages,
   }

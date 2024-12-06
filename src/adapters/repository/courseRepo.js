@@ -33,14 +33,11 @@ export const createCourse = async (courseData, tutorId) => {
 
   export const getCourseById = async (courseId) => {
     try {
-
-      console.log(courseId, "corseIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDD");
       
       const course = await Course.findOne({ _id: courseId })
         .populate("lessons")     // Populate the lessons field
         .populate("tutor"); // Populate the tutor's name field
   
-      console.log(course, "coursessssssssssssssssssss+++++++++++++++++++++++++++++");
       return course;
     } catch (err) {
       console.log(err);
