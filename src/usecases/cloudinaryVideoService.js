@@ -28,7 +28,7 @@ const uploadVideo = async (lesson) => {
   const uploadOptions = {
     public_id: fileName,
     resource_type: 'video',
-    chunk_size: 6000000, // 6MB chunks
+    chunk_size: 10 * 1024 * 1024, // 10MB chunks 
     eager: [
       { width: 640, height: 360, crop: 'scale', quality: 'auto:low', audio_codec: 'aac' },
       { width: 1280, height: 720, crop: 'scale', quality: 'auto', audio_codec: 'aac' }
@@ -44,12 +44,10 @@ const uploadVideo = async (lesson) => {
         return reject(error);
       }
       console.log('Video uploaded to Cloudinary successfully.', result);
-      resolve(result.secure_url); // Returns the URL of the uploaded video
+      resolve(result.secure_url); // Returns the URL of the uploaded video 
     });
-
     // Stream the video buffer directly to Cloudinary
     const bufferStream = streamifier.createReadStream(lesson.file.buffer);
-    console.log('Lesson file buffer:', lesson.file.buffer);
     bufferStream.pipe(uploadStream);
   });
 };

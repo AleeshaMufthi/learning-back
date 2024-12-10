@@ -2,7 +2,6 @@ import { Server } from "socket.io";
 import { saveMessageToDatabase } from "./framework/web/utils/helper.js";
 import { getUserType } from "./framework/web/utils/socketHelpers.js";
 
-
 export const socketConfig = (server) => {
   const io = new Server(server, {
     cors: {
@@ -26,28 +25,29 @@ export const socketConfig = (server) => {
         // User Chat
         roomId = [sender.email, selectedInstructor.email].sort().join("-");
         console.log(roomId, 'user roomid');
-        
+        socket.join(roomId);
+        io.to(roomId).emit("userStatus", { email: sender.email, status: "online" });
+        console.log(`${sender.email} is online`);
         
       } else if (instructor && selectedStudent) {
         // Tutor Chat
         roomId = [instructor.email, selectedStudent.email].sort().join("-"); 
         console.log(roomId, 'tutor roomid');
-        
+        socket.join(roomId);
+        io.to(roomId).emit("userStatus", { email: instructor.email, status: "online" });
+        console.log(`${instructor.email} is online`);
       } else {
         console.error("Missing sender and recipient information for room.");
         return;
       }
-      socket.join(roomId);
-      socket.to(roomId).emit('roomtest', {msg:"sadf"})
+      socket.roomId = roomId;
+      // socket.to(roomId).emit('roomtest', {msg:"sadf"})
     });
 
-    socket.on("sendMessage", async ({ sender,recipient, message, type }) => {
+    socket.on("sendMessage", async ({ sender, recipient, message, type }) => {
       const senderData = sender;
       const recipientData = recipient;
       const roomId = [senderData.email, recipientData.email].sort().join("-");
-      //   const Time = getTime(Date.now())
-      //   const ioString = new Date().toISOString()
-      //   const formattedDate = formatDateTimeToIST(ioString)
       const currentTime = new Date().toLocaleTimeString([], {  hour: "2-digit",  minute: "2-digit",});
 
       try {
@@ -59,17 +59,6 @@ export const socketConfig = (server) => {
           console.error("Sender or recipient not found in the database");
           return;
         }
-        console.log(senderData,"++++++++++++++++++++++++++++++++++++++")
-
-    //   const messageData = {
-    //     sender: senderInfo.userId,
-    //     senderType:senderInfo.userType,
-    //     recipient: recipientData._id,
-    //     recipientType: recipientInfo.userType,
-    //     message: message,
-    //     Time: currentTime,
-    //     type:"text"
-    //   }
 
         const messageData = await saveMessageToDatabase(          
           senderInfo.userId,
@@ -80,10 +69,6 @@ export const socketConfig = (server) => {
           type,
           currentTime
         );
-        console.log(messageData, 'roomId');
-
-
-        
         
         socket.to(roomId).emit("messageRecieved", {messageData} );
         
@@ -92,13 +77,20 @@ export const socketConfig = (server) => {
       }
     });
 
-        socket.on("typing", ({ roomId, userId }) => {
+    socket.on("typing", ({ roomId, userId }) => {
       socket.to(roomId).emit("typing", { userId });
     });
 
     socket.on("stopTyping", ({ roomId, userId }) => {
       socket.to(roomId).emit("stopTyping", { userId });
     });
+
+    socket.on("disconnect", () => {
+      if (socket.roomId) {
+        io.to(socket.roomId).emit("userStatus", { email: socket.id, status: "offline" });
+      }
+    });
+
     
   });
 };

@@ -10,8 +10,19 @@ export const addLessonToCourse = async (req, res) => {
     file: req.file,
     tutor: req.tutor,
   };
-  const lessonData = await lessonService.addLessonToCourse(lesson);
-  res.status(200).json({ message: "lesson added successfully", lesson: lessonData });
+    // Respond to the client immediately
+    res.status(202).json({ message: "Lesson upload started, please wait." });
+
+  // const lessonData = await lessonService.addLessonToCourse(lesson);
+  process.nextTick(async () => {
+    try {
+      const lessonData = await lessonService.addLessonToCourse(lesson);
+      console.log("Lesson processed:", lessonData);
+      res.status(200).json({ message: "lesson added successfully", lesson: lessonData });
+    } catch (err) {
+      console.error("Error while processing lesson:", err);
+    }
+  });
 };
 
 
@@ -19,44 +30,9 @@ export const getLesson = async (req, res) => {
     const lesson = await lessonService.getLesson(req.params.id);
     return res.status(200).json({ message: "Get lesson Details", lesson });
   };
-
-
-// export const getLessonVideo = async (req, res) => {
-//   console.log('ivde vanno')
-//     try {
-//       console.log(req.query,'req.queryyy')
-//       const { id } = req.query;
-      
-//       const lesson = await lessonService.getLesson(id);
-//       console.log(lesson, 'lesson from get lesson video');
-      
-  
-//       if (!lesson || !lesson.file) {
-//         return res.status(404).json({ message: "Leeson and Video not found" });
-//       }
-  
-//       // Proxy the video to the client
-//       const videoResponse = await fetch(lesson.file);
-  
-//       if (!videoResponse.ok) {
-//         throw new Error("Failed to fetch video from Cloudinary");
-//       }
-  
-//       // Set headers for the video response
-//       res.setHeader("Content-Type", videoResponse.headers.get("Content-Type"));
-//       res.setHeader("Content-Length", videoResponse.headers.get("Content-Length"));
-  
-//       // Pipe the video content to the client
-//       videoResponse.body.pipe(res);
-//     } catch (error) {
-//       console.error("Error streaming video:", error);
-//       res.status(500).json({ message: "Error streaming video" });
-//     }
-//   };
   
   
   export default {
     addLessonToCourse,
     getLesson,
-    // getLessonVideo,
   }

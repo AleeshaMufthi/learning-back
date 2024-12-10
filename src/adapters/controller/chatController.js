@@ -65,10 +65,7 @@ export const onFetchInstructorMessages = async (req, res) => {
   try {
       const userId = req.params.id
       const tutorId = req.tutor._id
-      console.log(userId, tutorId, 'userId and tutorId from the cntrllr')
       const data = await chatService.fetchInstructorMessages(userId, tutorId)
-
-      console.log(data, 'data from fetch instructor messages');
       
       return res.status(200).json({message: "Get instructor messages", data})
   } catch (error) {
