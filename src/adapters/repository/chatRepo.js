@@ -34,7 +34,7 @@ export const findCoursesByUserId = async (userId) => {
 export const findEnrolledStudents = async (courseId) => {
     try {
       return await User.find({ enrolledCourses: courseId })
-        .select("name email username") 
+        .select("name email username thumbnail") 
         .exec();
     } catch (error) {
       console.error("Error fetching enrolled students:", error);
@@ -46,6 +46,9 @@ export const findEnrolledStudents = async (courseId) => {
     const courses = await Course.find({ tutor: tutorId }).select('_id') 
     const courseIds = courses.map(course => course._id)
     const students = await User.find({ enrolledCourses: { $in: courseIds } })
+    .select('name email thumbnail');
+    console.log(students, 'studentsssssssssssssssssssssss');
+    
     return students
 }
 
@@ -88,7 +91,6 @@ export const getInstructorMessages = async (userId, tutorId) => {
         { $and: [{ 'sender': tutorId }, { 'recipient': userId }] }
     ]
 })
-console.log(data, 'data from the repo')
 return data
 }
 

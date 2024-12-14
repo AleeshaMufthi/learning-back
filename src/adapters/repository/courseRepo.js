@@ -48,7 +48,7 @@ export const createCourse = async (courseData, tutorId) => {
   export const addLessonToCourse = async (lessonId, courseId) => {
     await Course.findOneAndUpdate(
       { _id: courseId },
-      { $push: { lessons: lessonId } }
+      {  $addToSet: { lessons: lessonId } }
     );
     return true;
   };

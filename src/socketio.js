@@ -13,6 +13,25 @@ export const socketConfig = (server) => {
   io.on("connection", (socket) => {
     console.log("Connected to socket server:", socket.id);
 
+    socket.on('initiateCall', ({ userId, signalData, myId }) => {
+      io.to(userId).emit('incomingCall', { signalData, from: myId });
+    });
+  
+    socket.on('answerCall', (data) => {
+      console.log('Answer call received:', data);
+      io.to(data.to).emit('callAccepted', data.signal);
+    });
+  
+    socket.on('endCall', ({ to }) => {
+      io.to(to).emit('callEnded');
+    });
+  
+      // Handle disconnection
+      socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+      });
+  
+
     socket.on("joinedRoom", ({ sender, selectedInstructor, instructor, selectedStudent }) => {
 
       let roomId;
@@ -54,7 +73,7 @@ export const socketConfig = (server) => {
         // Determine sender type and ID
         const senderInfo = await getUserType(senderData.email);
         const recipientInfo = await getUserType(recipientData.email);
-
+ 
         if (!senderInfo || !recipientInfo) {
           console.error("Sender or recipient not found in the database");
           return;

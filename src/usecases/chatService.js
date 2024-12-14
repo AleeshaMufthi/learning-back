@@ -79,7 +79,6 @@ export const instructorMessages = async (tutorId) => {
 
 export const fetchInstructorMessages = async (userId, tutorId) => {
   const data = await chatRepo.getInstructorMessages(userId, tutorId)
-  console.log(data, 'data from service layer')
   return data
   }
   

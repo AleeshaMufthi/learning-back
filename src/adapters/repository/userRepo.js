@@ -116,17 +116,17 @@ const unblockUserById = async (_id) => {
 };
 
 const updateDetailsById = async (user) => {
+  const { userDetails, thumbnail } = user;
   const updateFields = {
-    name: user.name,
-    age: user.age,
-    about: user.about,
-    address: user.address,
-    visible: user.visible,
-    thumbnail: user.thumbnail,
+    name: userDetails.name,
+    age: userDetails.age,
+    about: userDetails.about,
+    address: userDetails.address,
+    visible: userDetails.visible,
+    thumbnail,
   };
-  
   const updatedUser = await userModel.updateOne(
-    { _id: user._id },
+    { _id: userDetails._id },
     { $set: updateFields }
   );
   return updatedUser;

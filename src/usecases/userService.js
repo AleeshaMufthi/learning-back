@@ -7,6 +7,7 @@ import generateOtp from '../framework/web/utils/generateOtp.js'
 import verifyToken from '../framework/web/utils/verifyToken.js'
 import { createAccessToken, createRefreshToken } from '../framework/web/utils/generateTokens.js'
 import uploadImage from './cloudinaryImgService.js'
+import { v2 as cloudinary } from "cloudinary";
 
 export const handleSignIn = async({ email, password }) => {
   let user = await findUserByEmail(email);
@@ -196,7 +197,16 @@ export const unblockUser = async (userId) => {
 };
 
 export const getUserDetails = async (userId) => {
-  const userDetails = await findUserById(userId);
+  let userDetails = await findUserById(userId);
+  console.log(userDetails, 'user detailssssssssssssssssssssssssssssssssssssssssssssssssssss');
+  if(userDetails){
+    userDetails = userDetails.toObject();
+  
+    userDetails.thumbnail = cloudinary.url(userDetails.thumbnail, {
+      resource_type: "video" ? "video" : "image", 
+      secure: true, 
+    });   
+  }
   if (!userDetails) {
     throw AppError.validation("User Details was not found in database");
   }
@@ -216,7 +226,7 @@ export const updateUserDetails = async (userDetails, file) => {
   const updatedUserDetails = await updateDetailsById({
     userDetails,
     thumbnail: thumbnailUrl
-  }, { new: true }
+  }
   );
   return updatedUserDetails;
 };
