@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { saveMessageToDatabase } from "./framework/web/utils/helper.js";
+import { saveNotificationToDatabase } from "./framework/web/utils/helper.js";
 import { getUserType } from "./framework/web/utils/socketHelpers.js";
 
 export const socketConfig = (server) => {
@@ -109,7 +110,29 @@ export const socketConfig = (server) => {
         io.to(socket.roomId).emit("userStatus", { email: socket.id, status: "offline" });
       }
     });
+   
 
+    socket.on("joinRoom", ({ userId }) => {
+      if (userId) {
+        socket.join(userId);
+      }
+    });
+
+    socket.on("to-users", async (data) => {
+      const { heading, message, isRead, url, from, fromModel, to, toModel } = data;
+      const savedNotification = await saveNotificationToDatabase(
+        heading,
+        message,
+        isRead,
+        url,
+        from, 
+        fromModel,
+        to,
+        toModel
+      );
+      console.log("Notification saved to the database:", savedNotification);
+      io.emit("newNotification", { Notification: savedNotification });
+    });
     
   });
 };

@@ -47,7 +47,6 @@ export const findEnrolledStudents = async (courseId) => {
     const courseIds = courses.map(course => course._id)
     const students = await User.find({ enrolledCourses: { $in: courseIds } })
     .select('name email thumbnail');
-    console.log(students, 'studentsssssssssssssssssssssss');
     
     return students
 }

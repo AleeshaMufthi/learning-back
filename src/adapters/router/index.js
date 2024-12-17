@@ -7,6 +7,7 @@ import userLessonRoute from './user/lessonRoute.js'
 import userOrdersRoute from './user/orderRoute.js'
 import userWalletRoute from './user/walletRoute.js'
 import userChatRoute from './user/chatRoute.js'
+import userNotificationRoute from './user/notificationRoute.js'
 
 import tutorDetailsRoute from './tutor/profileRoute.js'
 import tutorCourseRoute from './tutor/courseRoute.js'
@@ -48,6 +49,10 @@ const defaultRoutes = [
     {
         path: "/user/chat",
         route: userChatRoute,
+    },
+    {
+        path: "/user/notification",
+        route: userNotificationRoute,
     },
     {
         path: '/tutor/details',

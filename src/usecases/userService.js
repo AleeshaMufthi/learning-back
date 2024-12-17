@@ -198,7 +198,6 @@ export const unblockUser = async (userId) => {
 
 export const getUserDetails = async (userId) => {
   let userDetails = await findUserById(userId);
-  console.log(userDetails, 'user detailssssssssssssssssssssssssssssssssssssssssssssssssssss');
   if(userDetails){
     userDetails = userDetails.toObject();
   
