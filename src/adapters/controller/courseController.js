@@ -63,6 +63,7 @@ export const getAllCourses = async (req, res) => {
       req.params.id
     );
     course.totalStudentsEnrolled = totalStudentsEnrolled;
+    
     res.status(200).json({ message: "course Found", data: course });
   };
 

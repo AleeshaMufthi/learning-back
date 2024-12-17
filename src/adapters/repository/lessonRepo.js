@@ -14,6 +14,7 @@ export const addLessonToService = async (lesson) => {
 
 export const findLessonById = async (lessonId) => {
     const lesson = Lesson.findById({ _id: lessonId });
+    console.log(lesson, 'lesson from repo');
     return lesson;
   }
 

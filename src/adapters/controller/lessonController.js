@@ -14,7 +14,7 @@ export const addLessonToCourse = async (req, res) => {
     file: req.file,
     tutor: req.tutor,
   };
-  const lessonData = await lessonService.addLessonToCourse(lesson);
+  const lessonData = await lessonService.addLessonToCourse(lesson);     
   console.log("Lesson added to service in", Date.now() - start, "ms");
   res.status(200).json({ message: "lesson added successfully", lesson: lessonData });
   console.log("Total time for lesson creation:", Date.now() - start, "ms");

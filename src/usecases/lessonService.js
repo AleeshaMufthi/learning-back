@@ -2,6 +2,7 @@ import courseService from "./courseService.js";
 import lessonRepository from "../adapters/repository/lessonRepo.js";
 import uploadVideo from "./cloudinaryVideoService.js";
 import fetch from "node-fetch";
+import { v2 as cloudinary } from "cloudinary";
 
   export const addLessonToCourse = async (lesson) => {
     const start = Date.now();
@@ -40,9 +41,36 @@ import fetch from "node-fetch";
   
  export const getLesson = async (lessonId) => {
   let lesson = await lessonRepository.findLessonById(lessonId);
+  console.log(lesson, 'lesson from service');
   lesson = lesson.toObject();
-  lesson.videoFormat = lesson.file.split(".")[1];
-  lesson.videoURL = await uploadVideo(lesson);
+
+  // lesson.videoFormat = lesson.file.split(".")[1];
+  // lesson.videoURL = await uploadVideo(lesson);
+  // return lesson;
+
+
+  // Extract public_id from file URL
+  const publicId = lesson.file
+    .split("/")
+    .slice(-2) // Keep last two segments (e.g., "lessons/Embedded-Servers...")
+    .join("/")
+    .split(".")[0]; // Remove the file extension
+
+  console.log("Extracted Public ID:", publicId);
+
+  // Generate a signed private URL
+  try {
+    lesson.videoURL = cloudinary.utils.private_download_url(publicId, "mp4", {
+      resource_type: "video",
+      expires_at: Math.floor(Date.now() / 1000) + 3600, // 1-hour expiry
+    });
+
+    console.log("Generated Signed Video URL:", lesson.videoURL);
+  } catch (error) {
+    console.error("Error generating signed URL:", error);
+    throw new Error("Could not generate video URL");
+  }
+
   return lesson;
 };
 
