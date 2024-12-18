@@ -202,7 +202,7 @@ export const getUserDetails = async (userId) => {
     userDetails = userDetails.toObject();
   
     userDetails.thumbnail = cloudinary.url(userDetails.thumbnail, {
-      resource_type: "video" ? "video" : "image", 
+      resource_type: "image", 
       secure: true, 
     });   
   }

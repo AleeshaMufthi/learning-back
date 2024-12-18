@@ -60,9 +60,6 @@ export const fetchEnrolledCourses = async (userId) => {
                 return acc
             }, {})
             const sortedData = data.sort((a, b) => new Date(b.Time).getTime() - new Date(a.Time).getTime())
-            
-            console.log(sortedData,'sortedData');
-            console.log(group,'group');
             return { group, sortedData }
         }
         throw new Error('No messages found')

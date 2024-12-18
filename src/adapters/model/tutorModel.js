@@ -34,6 +34,9 @@ const tutorSchema = new mongoose.Schema(
       address: String,
       qualification: String,
       skills: String,
+      thumbnail: {
+        type: String,
+      },
       isBlocked: {
         type: Boolean,
         default: false,

@@ -31,6 +31,8 @@ import {
   createRefreshToken,
 } from "../framework/web/utils/generateTokens.js";
 import emailOtp from "../framework/config/emailConnect.js";
+import { v2 as cloudinary } from "cloudinary";
+import uploadImage from "./cloudinaryImgService.js";
 
 export const handleSignIn = async ({ email, password }) => {
   let tutor = await findTutorByEmail(email);
@@ -197,15 +199,31 @@ export const unblockTutor = async (tutorId) => {
 };
 
 export const getTutorDetails = async (tutorId) => {
-  const tutorDetails = await findTutorById(tutorId);
+  let tutorDetails = await findTutorById(tutorId);
+  if(tutorDetails){
+    tutorDetails = tutorDetails.toObject()
+    tutorDetails.thumbnail = cloudinary.url(tutorDetails.thumbnail, {
+      resource_type: "image",
+      secure: true
+    })
+  }
   if (!tutorDetails) {
     throw AppError.validation("Tutor Details was not found in database");
   }
   return tutorDetails;
 };
 
-export const updateTutorDetails = async (tutorDetails) => {
-  const updatedTutorDetails = await updateDetailsById(tutorDetails);
+export const updateTutorDetails = async (tutorDetails, file) => {
+  const thumbnailUrl = await uploadImage(file)
+  if(!thumbnailUrl){
+    console.log("Cloudinary upload failed");
+    throw AppError.database("Error while uploading thumbnail")
+  }
+  const updatedTutorDetails = await updateDetailsById({
+    tutorDetails,
+    thumbnail: thumbnailUrl,
+  }
+  );
 
   return updatedTutorDetails;
 };

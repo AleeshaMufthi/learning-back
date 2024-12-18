@@ -23,7 +23,7 @@ export const findCoursesByUserId = async (userId) => {
   export const findCourseWithTutor = async (courseId) => {
     try {
       return await Course.findById(courseId)
-        .populate("tutor", "name email username")
+        .populate("tutor", "name email username thumbnail")
         .exec();
     } catch (error) {
       console.error("Error fetching course with tutor:", error);
@@ -47,7 +47,6 @@ export const findEnrolledStudents = async (courseId) => {
     const courseIds = courses.map(course => course._id)
     const students = await User.find({ enrolledCourses: { $in: courseIds } })
     .select('name email thumbnail');
-    
     return students
 }
 

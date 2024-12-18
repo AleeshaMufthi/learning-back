@@ -25,6 +25,7 @@ export const getUserDetails = asyncHandler(async (req, res) => {
       throw AppError.validation(error.details[0].message);
     }
     const userDetails = await userService.getUserDetails(value);
+    
     return res.status(200).json({ message: "user details found", userDetails });
   });
 
@@ -33,18 +34,14 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
     if (error) {
       throw AppError.validation(error.details[0].message);
     }
-    
-     // Check if the file is present
   if (!req.file) {
-    
     throw AppError.validation("Thumbnail is required");
   }
     
     const userData = await userService.updateUserDetails({
       ...value,
-      _id: req.user._id,
-      
-    }, req.file);
+      _id: req.user._id }, req.file);
+    
     res
       .status(200)
       .json({ message: "user details updated successfully", data: userData });

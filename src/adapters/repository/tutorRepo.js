@@ -105,17 +105,22 @@ const findTutorByToken = async (email) => {
   };
 
   const updateDetailsById = async (tutor) => {
+    const {tutorDetails, thumbnail } = tutor
+    const updatedField = {
+      name: tutorDetails.name,
+      age: tutorDetails.age,
+      qualification: tutorDetails.qualification,
+      address: tutorDetails.address,
+      about: tutorDetails.about,
+      thumbnail
+    }
     const updatedTutor = await Tutor.updateOne(
-      { _id: tutor._id },
       {
-        name: tutor.name,
-        age: tutor.age,
-        about: tutor.about,
-        address: tutor.address,
-        qualification: tutor.qualification,
-        skills: tutor.skills,
+        _id: tutorDetails._id,
+      },{
+        $set: updatedField
       }
-    );
+    )
     return updatedTutor;
   };
 

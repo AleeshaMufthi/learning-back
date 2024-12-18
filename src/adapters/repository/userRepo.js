@@ -129,6 +129,8 @@ const updateDetailsById = async (user) => {
     { _id: userDetails._id },
     { $set: updateFields }
   );
+  console.log(updatedUser, 'updated user');
+  
   return updatedUser;
 };
 
