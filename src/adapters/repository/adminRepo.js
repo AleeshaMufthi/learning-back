@@ -69,6 +69,14 @@ export const createAdmin = ({ name, password, phone, email, adminname }) => {
     return isTokenPresent
   }
 
+  export const updateAdminBalance = async (adminId, amount) => {
+    return await adminModel.findByIdAndUpdate(adminId, { $inc: { balance: amount } }, { new: true });
+  };
+
+  export const findAdmin = async () => {
+    return await adminModel.findOne();
+  };
+
 export default {
     findAdminByEmail,
     findAdminByPhone,
@@ -79,4 +87,6 @@ export default {
     createAdmin,
     addRefreshTokenById,
     findByTokenAndDelete,
+    updateAdminBalance,
+    findAdmin,
 }

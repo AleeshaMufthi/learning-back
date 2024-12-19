@@ -25,7 +25,7 @@ export const findOrdersByUserId = async (userId) =>
       .select("-__v -updatedAt")
       .populate("course", "title tagline price");
 
-      export const findOrderById = async (orderId) => {
+export const findOrderById = async (orderId) => {
         try {
           const order = await Orders.findById(orderId); // Log the order fetched from DB
           return order;
@@ -45,6 +45,10 @@ export const findOrdersByUserId = async (userId) =>
       return await Orders.findByIdAndUpdate(orderId, { enrolled }, { new: true });
   };
 
+  export const findOrderByCourseId = async (orderId) => {
+    return await Orders.findById(orderId).populate("course user");
+  };
+
 export default {
     createOrder,
     updateOrderStatusById,
@@ -52,4 +56,5 @@ export default {
     findOrderById,
     updateOrderStatus,
     updateOrderEnrolledStatus,
+    findOrderByCourseId,
 }

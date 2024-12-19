@@ -8,15 +8,18 @@ import userOrdersRoute from './user/orderRoute.js'
 import userWalletRoute from './user/walletRoute.js'
 import userChatRoute from './user/chatRoute.js'
 import userNotificationRoute from './user/notificationRoute.js'
+import userRevenueRoute from './user/revenueRoute.js'
 
 import tutorDetailsRoute from './tutor/profileRoute.js'
 import tutorCourseRoute from './tutor/courseRoute.js'
 import tutorLessonRoute from './tutor/lessonRoute.js'
 import tutorChatRoute from './tutor/chatRoute.js'
+import tutorRevenueRoute from './tutor/revenueRoute.js'
 
 import adminUserRoute from './admin/usersRoute.js'
 import adminTutorRoute from './admin/TutorsRoute.js'
 import adminCategoryRoute from './admin/categoryRoute.js'
+import adminRevenueRoute from './admin/revenueRoute.js'
 import { path } from "@ffmpeg-installer/ffmpeg";
 
 const router = express.Router()
@@ -55,6 +58,10 @@ const defaultRoutes = [
         route: userNotificationRoute,
     },
     {
+       path: '/user/revenue',
+       route: userRevenueRoute,
+    },
+    {
         path: '/tutor/details',
         route: tutorDetailsRoute
     },
@@ -71,6 +78,10 @@ const defaultRoutes = [
         route: tutorChatRoute,
     },
     {
+        path: "/tutor/revenue",
+        route: tutorRevenueRoute,
+    },
+    {
         path: '/admin/users',
         route: adminUserRoute
     },
@@ -82,6 +93,10 @@ const defaultRoutes = [
         path: "/admin/category",
         route: adminCategoryRoute,
     },
+    {
+        path: "/admin/revenue",
+        route: adminRevenueRoute,
+    }
 ]
 
 defaultRoutes.forEach((route) => {

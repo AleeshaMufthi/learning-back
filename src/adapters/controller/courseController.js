@@ -67,7 +67,7 @@ export const getAllCourses = async (req, res) => {
     res.status(200).json({ message: "course Found", data: course });
   };
 
-  export const enrollCourse = async (req, res) => {
+  export const enrollCourse = async (req, res) => { 
     const { error } = objectIdSchema.validate(req.body.courseId);
     if (error) return res.status(400).json({ message: "invalid course id" });
     const params = {
