@@ -61,7 +61,7 @@ const handleOrderPayment = async (orderId) => {
     const totalRevenue = revenues.reduce((acc, revenue) => acc + revenue.adminRevenue, 0);
   
     const formattedRevenues = revenues.map((rev) => ({
-      courseTitle: rev.courseId?.title || 'Unknown Course',
+      courseTitle: rev.courseId?.title || 'Course Deleted',
       orderId: rev.orderId?._id || 'Unknown Order',
       adminRevenue: rev.adminRevenue,
       date: rev.createdAt,
@@ -77,7 +77,7 @@ const handleOrderPayment = async (orderId) => {
     const totalRevenue = revenues.reduce((acc, revenue) => acc + revenue.tutorRevenue, 0);
   
     const formattedRevenues = revenues.map((rev) => ({
-      courseTitle: rev.courseId?.title || 'Unknown Course',
+      courseTitle: rev.courseId?.title || 'Course Deleted',
       orderId: rev.orderId?._id || 'Unknown Order',
       tutorRevenue: rev.tutorRevenue,
       date: rev.createdAt,

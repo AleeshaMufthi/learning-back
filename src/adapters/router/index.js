@@ -20,7 +20,7 @@ import adminUserRoute from './admin/usersRoute.js'
 import adminTutorRoute from './admin/TutorsRoute.js'
 import adminCategoryRoute from './admin/categoryRoute.js'
 import adminRevenueRoute from './admin/revenueRoute.js'
-import { path } from "@ffmpeg-installer/ffmpeg";
+import adminDashboardRoute from './admin/dashboardRoute.js'
 
 const router = express.Router()
 
@@ -96,6 +96,10 @@ const defaultRoutes = [
     {
         path: "/admin/revenue",
         route: adminRevenueRoute,
+    },
+    {
+        path: "/admin/dashboard",
+        route: adminDashboardRoute,
     }
 ]
 
