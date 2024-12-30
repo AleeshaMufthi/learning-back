@@ -31,7 +31,7 @@ const otpSchema = new mongoose.Schema(
 )
 
 // Create the index on 'createdAt' field
-otpSchema.index({created_At: 1}, {expireAfterSeconds: 600})
+// otpSchema.index({created_At: 1}, {expireAfterSeconds: 600})
 
 const OtpModel = mongoose.model("otp", otpSchema)
 
