@@ -20,7 +20,7 @@ const courseSchema = new Schema(
             required: true,
           },
           category: {
-            type: String,
+            type: Schema.Types.ObjectId,
             required: true,
           },
           difficulty: {
