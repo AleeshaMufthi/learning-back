@@ -64,23 +64,6 @@ export const handleForgetPassword = async (req, res) => {
     }
   };
 
-  // export const verifyOtp = async (req, res) => {
-  //   const { otp, email } = req.body;
-  //   console.log("Received OTP:", otp);
-  //   console.log("Received Email:", email);
-  //   try {
-  //     // Call a service function to verify the OTP
-  //     const isValid = await userService.verifyOtp(email, otp);
-  
-  //     if (isValid) {
-  //       res.status(200).json({ message: "OTP verified successfully." });
-  //     } else {
-  //       res.status(400).json({ message: "Invalid OTP." });
-  //     }
-  //   } catch (err) {
-  //     res.status(500).json({ message: "An error occurred during OTP verification." });
-  //   }
-  // };
 
   export const handleResetPassword = async (req, res) => {
     try {
@@ -154,6 +137,9 @@ export const restoreUserDetails = asyncHandler(async (req, res) => {
     const data = await userService.googleAuthValidate(email, userInfo)
 
     if (data) {
+      attachTokenToCookie("accessToken", data.accessToken, res);
+      attachTokenToCookie("refreshToken", data.refreshToken, res);
+
       res.status(200).json({ message: 'Login successful', token: 'your-generated-token', user: data });
     } else {
       res.status(400).json({ message: 'User authentication failed' });

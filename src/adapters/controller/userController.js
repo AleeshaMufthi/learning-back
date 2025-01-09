@@ -30,17 +30,17 @@ export const getUserDetails = asyncHandler(async (req, res) => {
   });
 
 export const updateUserDetails = asyncHandler(async (req, res) => {
+  
     const { value, error } = userDetailsSchema.validate(req.body);
+    console.log("File received in request:", req.file);
+  console.log("Body received in request:", req.body);
     if (error) {
       throw AppError.validation(error.details[0].message);
     }
-  if (!req.file) {
-    throw AppError.validation("Thumbnail is required");
-  }
-    
     const userData = await userService.updateUserDetails({
       ...value,
       _id: req.user._id }, req.file);
+    console.log(userData, 'user data');
     
     res
       .status(200)

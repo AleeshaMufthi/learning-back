@@ -125,19 +125,6 @@ export const forgetPassword = async (email) => {
   return user;
 };
 
-// export const verifyOtp = async ({email, otp}) => {
-//   try {
-//     const isEmailOtp = await findOtpByEmail(email);
-
-//     if (isEmailOtp && isEmailOtp.otp === Number(otp) ) {
-     
-//     return true;
-//     }
-//     return false;
-//   } catch (err) {
-//     throw new Error("Error verifying OTP.");
-//   }
-// };
 
 export const resetPassword = async ( email, newPassword ) => {
   try {

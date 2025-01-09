@@ -136,12 +136,21 @@ const updateDetailsById = async (user) => {
 
 const googleAuthUser = async (email, userInfo) => {
   try{
-    const user = await userModel.findOne({ email }, { email: 1, name: 1, password: 1, phone: 1, isBlocked: 1 })
+    const user = await userModel.findOne({ email },
+      { email: 1, name: 1, password: 1, phone: 1, isBlocked: 1 })
+    console.log(user, 'user from googleAuth');
+    
     if(!user){
+          const randomUsername = `user_${Math.random().toString(36).substring(7)}`;
+          const randomPhone = `0000000000`; // Default or placeholder phone number
+          const randomPassword = `google_${Math.random().toString(36).substring(7)}`;
        // User does not exist, create a new user with Google info
       const newUser = new userModel({
-      name: userInfo.name,
-      email: userInfo.email,
+        name: userInfo.name,
+        email: userInfo.email,
+        username: randomUsername,
+        phone: randomPhone,
+        password: randomPassword,
     })
 
     await newUser.save();
@@ -163,6 +172,7 @@ const googleAuthUser = async (email, userInfo) => {
     return { userInfo: userInfoResponse, accessToken, refreshToken }  
 
   }catch(error){
+    console.log(error, "Original error in googleAuth");
     throw new Error("Database error while google user authenticating")
   }
 }

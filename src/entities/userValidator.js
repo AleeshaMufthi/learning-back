@@ -22,6 +22,7 @@ const userDetailsSchema = Joi.object({
   age: Joi.number().integer().min(0).optional(),
   address: Joi.string().optional(),
   visible: Joi.boolean().optional(),
-});
+  thumbnail: Joi.any().optional(),
+}).unknown(true); ;
 
 export default userDetailsSchema
