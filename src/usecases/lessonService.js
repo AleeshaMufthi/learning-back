@@ -70,6 +70,7 @@ import { v2 as cloudinary } from "cloudinary";
     console.error("Error generating signed URL:", error);
     throw new Error("Could not generate video URL");
   }
+  console.log("Lesson",lesson)
   return lesson;
 };
 

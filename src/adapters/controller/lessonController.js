@@ -23,6 +23,8 @@ export const addLessonToCourse = async (req, res) => {
 
 export const getLesson = async (req, res) => {
     const lesson = await lessonService.getLesson(req.params.id);
+    console.log(lesson, 'lesson from ctrl');
+    
     return res.status(200).json({ message: "Get lesson Details", lesson });
   };
   
