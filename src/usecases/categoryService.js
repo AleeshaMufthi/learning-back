@@ -3,7 +3,6 @@ import categoryRepository from "../adapters/repository/categoryRepo.js";
 export const getAllCategories = async () => {
     const categories = await categoryRepository.getAllCategories();
     if (!categories.length) {
-      console.log("No category found");
     }
     return categories;
   };

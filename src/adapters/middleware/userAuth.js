@@ -39,7 +39,6 @@ const isAuthUser = async (req, res, next) => {
         return res.status(403).json({ err: "Refresh token is invalid or expired"});
       }
     } else {
-      console.log(err);
       return res.status(401).json({ err: err.message, name: err.name });
     }
   }

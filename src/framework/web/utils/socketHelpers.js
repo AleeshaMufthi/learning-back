@@ -24,27 +24,3 @@ export const getUserType = async (email)  => {
 
 
 
-// // export const verifyUser = async (token) => {
-
-// //     try {
-// //         console.log('Token received for verification:', token);
-        
-// //         let decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-// //         if (decoded && typeof decoded !== 'string' && 'userId' in decoded && 'role' in decoded){
-// //             const userId = decoded.userId;
-// //             const role = decoded.role;
-// //             if (role === 'user') {
-// //                 const user = await userModel.findById(userId);
-// //                 return {user,role}
-// //             } else if (role === 'tutor') {
-// //                 console.log('Instructor Auth in socket')
-// //                 const user= await tutorModel.findById(userId);
-// //                 return {user, role}
-// //             }
-// //         }
-// //         throw new Error('Invalid token');
-// //     } catch (error) {
-// //         throw new Error('Invalid token');
-// //     }
-// // }

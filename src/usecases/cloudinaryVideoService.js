@@ -42,12 +42,10 @@ const uploadVideo = async (lesson) => {
         console.error('Error while uploading video to Cloudinary:', error);
         return reject(error);
       }
-      console.log('Video uploaded to Cloudinary successfully.', result);
       resolve(result.secure_url);
     });
 
     const bufferStream = streamifier.createReadStream(lesson.file.buffer);
-    console.log('Lesson file buffer:', lesson.file.buffer);
     bufferStream.pipe(uploadStream);
   });
 };

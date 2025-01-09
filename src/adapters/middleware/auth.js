@@ -13,7 +13,6 @@ const isAuth = async (req, res, next) => {
     try {
       const response = await verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
       // Remove role-specific check
-      console.log("token verified", response.user.name);
       req.user = response.user;
       next();
     } catch (err) {
@@ -39,7 +38,6 @@ const isAuth = async (req, res, next) => {
           return res.status(403).json({ err: "Refresh token is invalid or expired" });
         }
       } else {
-        console.log(err);
         return res.status(401).json({ err });
       }
     }

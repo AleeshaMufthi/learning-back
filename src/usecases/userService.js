@@ -35,11 +35,9 @@ export const handleSignUp = async ({ name, password, email, phone, otp }) => {
   try{
     const isEmailOtp = await findOtpByEmail(email);
     if (!isEmailOtp) {
-      console.log('No OTP found for email:', email);
       throw AppError.conflict("Try Again Otp TimeOut");
     }
     if (isEmailOtp.otp != otp) {
-      console.log('Incorrect OTP:', otp);
       throw AppError.conflict("Otp is Not Correct Try Again");
     }
     const isEmailTaken = await findUserByEmail(email);
@@ -148,7 +146,6 @@ export const getUserFromToken = async (accessToken) => {
     return await findUserByEmail(decoded.email);
   }
     catch(err) {
-      console.log("error while decoding access token", err);
       return false;
     }
   }
@@ -163,7 +160,6 @@ export const getAccessTokenByRefreshToken = async (refreshToken) => {
     const accessToken = createAccessToken(user)
     return { user, accessToken }
   } catch (err) {
-    console.log("Error verifying refresh token - ", err);
     throw AppError.authentication(err.message);
   }
 };
@@ -204,7 +200,6 @@ export const updateUserDetails = async (userDetails, file) => {
   const thumbnailUrl = await uploadImage(file); // Upload the file to Cloudinary
 
   if (!thumbnailUrl) {
-    console.log('Cloudinary upload failed');
     
     throw AppError.database("Error while uploading media file");
   }

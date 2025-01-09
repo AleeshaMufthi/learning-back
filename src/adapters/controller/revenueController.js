@@ -1,7 +1,6 @@
 import revenueService from "../../usecases/revenueService.js";
 
 export const processOrderPayment = async (req, res) => {
-    console.log(req.params, 'request paramsssssssssssssss');
     
     const { orderId } = req.params;
     try {

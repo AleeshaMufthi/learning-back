@@ -30,7 +30,6 @@ const uploadImage = async (file) => {
                         console.error("Error while uploading image to Cloudinary:", error);
                         return reject(error);
                     }
-                    console.log("Image uploaded to Cloudinary successfully.", result);
                     resolve(result.secure_url);
                 }
             );

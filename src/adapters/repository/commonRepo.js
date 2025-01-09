@@ -11,7 +11,6 @@ export const findOtpByEmail = async (email) => {
       console.log(otp,'Retrieved otp')
       return otp
   } catch (error) {
-      console.log(error)
       throw AppError.database("An error occurred while retrieving OTP data.");
   }
 }
@@ -26,7 +25,6 @@ export const createOtp = async({ phone, email, otp}) => {
       })
       return await otpModel.save()   
   }catch(error){ 
-      console.log("Error saving OTP data to the database - ", error);
       throw AppError.database("An error occurred while processing your data.");
   }
 }
@@ -43,7 +41,6 @@ export const updateOtp = async ({ isEmailOtp }) => {
       );
       return updatedOtp;
   }catch(error){
-      console.log("Error saving OTP data to database - ", error);
       throw AppError.database("An error occurred while processing your data")
   }
 }

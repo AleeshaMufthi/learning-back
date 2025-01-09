@@ -5,7 +5,6 @@ dotenv.config()
 
 const OTP = async(mobile, otp) => {
     try{
-      console.log("Authorization Token:", process.env.AUTH); 
         const response = await axios.post('https://www.fast2sms.com/dev/bulkV2', {
             variables_values: otp,
             route: 'otp',

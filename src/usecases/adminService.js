@@ -115,7 +115,6 @@ export const getAdminFromToken = async (accessTokenAdmin) => {
         async (data) => await adminRepository.findAdminByEmail(data?.user.email)
       )
       .catch((err) => {
-        console.log("error while decoding access token", err);
         return false;
       });
   };
@@ -132,7 +131,6 @@ export const getAccessTokenByRefreshToken = async (refreshTokenAdmin) => {
         return accessTokenAdmin;
       })
       .catch((err) => {
-        console.log("error verifying refresh token - ", err);
         throw AppError.authentication(err.message);
       });
   };

@@ -17,7 +17,6 @@ export const createCourse = async (courseData, tutorId) => {
       .save()
       .then((response) => response)
       .catch((error) => {
-        console.log("Error saving course data to database - ", error);
         throw new AppError.database(
           "An error occured while processing your data"
         );
@@ -26,7 +25,6 @@ export const createCourse = async (courseData, tutorId) => {
 
   export const getCoursesByTutorId = async (tutorId) => {
     const courses = await Course.find({ tutor: tutorId }).catch((err) => {
-      console.log(err);
     });
     return courses;
   };
@@ -40,7 +38,6 @@ export const createCourse = async (courseData, tutorId) => {
   
       return course;
     } catch (err) {
-      console.log(err);
       return null;  
     }
   };

@@ -24,7 +24,6 @@ export const getTutorDetails = asyncHandler(async (req, res) => {
       throw AppError.validation(error.details[0].message);
     }
     const tutorDetails = await tutorService.getTutorDetails(value);
-    console.log(tutorDetails, 'tutordetails from the controller');
     
     return res.status(200).json({ message: "tutor details found", tutorDetails });
 });
@@ -41,7 +40,6 @@ export const updateTutorDetails = asyncHandler(async (req, res) => {
       ...value,
       _id: req.tutor._id,
     }, req.file);
-    console.log(tutorData, 'tutordata from the updateTutorDetials');
     
     res
       .status(200)

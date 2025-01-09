@@ -22,10 +22,8 @@ export const getAllNotifications = async (req, res) => {
 
 export const markNotificationAsRead = async (req, res) => {
   const { id } = req.params; 
-  console.log(id, req.params, '0000000000000000');
   
   const userId = req.user.id;
-  console.log(userId, 'user iddddd');
 
   try {
     const updatedNotification = await notificationService.markAsRead(id, userId);

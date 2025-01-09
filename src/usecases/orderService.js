@@ -9,7 +9,6 @@ export const createOrder = async ({ courseId, userId, user }) => {
     );
   
     if (!price) {
-      console.log("price was not foundfor the course : " + courseId);
       throw AppError.database();
     }
     const { _id: orderId } = await orderRepository.createOrder({
@@ -41,7 +40,6 @@ export const createOrder = async ({ courseId, userId, user }) => {
   export const getAllOrders = async (userId) => {
     const orders = await orderRepository.findOrdersByUserId(userId);
     if (!orders.length) {
-      console.log("no transaction found for the user :", userId);
     }
     return orders;
   };

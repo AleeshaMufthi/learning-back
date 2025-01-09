@@ -27,7 +27,6 @@ const uploaded = async (course, thumbnail) => {
             console.error("Error while uploading thumbnail to Cloudinary:", error);
             return reject(error);
           }
-          console.log("Thumbnail uploaded to Cloudinary successfully.", result);
           resolve(result.secure_url);
         }
       );

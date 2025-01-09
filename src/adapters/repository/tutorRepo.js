@@ -67,7 +67,6 @@ const findTutorByToken = async (email) => {
       .save()
       .then((response) => response)
       .catch((error) => {
-        console.log("Error saving tutor data to database - ", error);
         throw new AppError.database(
           "An error occured while processing your data"
         );

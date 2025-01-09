@@ -12,7 +12,6 @@ const findUserByEmail = async (email) => {
       password: 1, 
       phone: 1 });
   } catch (err) {
-    console.log("Error querying database for user with email", email, err);
     throw err; 
   }
 };  
@@ -21,7 +20,6 @@ const findUserByPhone = async (phone) => {
   try {
     return await userModel.findOne({ phone });
   } catch (err) {
-    console.log("Error querying database for user with phone", phone, err);
     throw err;
   }
 };
@@ -30,7 +28,6 @@ const findUserById = async (_id) => {
   try {
     return await userModel.findOne({ _id });
   } catch (err) {
-    console.log("Error querying database for user with ID", _id, err);
     throw err; 
   }
 };
@@ -39,7 +36,6 @@ const findUserByUserName = async (username) => {
   try {
     return await userModel.findOne({ username });
   } catch (err) {
-    console.log("Error querying database for user with username", username, err);
     throw err;
   }
 };
@@ -55,7 +51,6 @@ const findUserByUserId = async (userId) => {
         role: 1
       });
   } catch (err) {
-    console.log("Error querying database for user with id", userId, err);
     throw err;
   }
 };
@@ -78,7 +73,6 @@ const createUser = async ({ name, password, phone, email, username }) => {
     .save()
     .then((response) => response)
     .catch((error) => {
-      console.log("Error saving user data to database - ", error);
       throw new AppError.database(
         "An error occured while processing your data"
       );
@@ -129,7 +123,6 @@ const updateDetailsById = async (user) => {
     { _id: userDetails._id },
     { $set: updateFields }
   );
-  console.log(updatedUser, 'updated user');
   
   return updatedUser;
 };
@@ -138,7 +131,6 @@ const googleAuthUser = async (email, userInfo) => {
   try{
     const user = await userModel.findOne({ email },
       { email: 1, name: 1, password: 1, phone: 1, isBlocked: 1 })
-    console.log(user, 'user from googleAuth');
     
     if(!user){
           const randomUsername = `user_${Math.random().toString(36).substring(7)}`;
@@ -158,7 +150,6 @@ const googleAuthUser = async (email, userInfo) => {
 
     }
     if(user.isBlocked){
-      console.log("Access Denied: User is blocked"); 
       throw new Error("User is blocked");
     }
     const accessToken = createAccessToken(user);
@@ -172,7 +163,6 @@ const googleAuthUser = async (email, userInfo) => {
     return { userInfo: userInfoResponse, accessToken, refreshToken }  
 
   }catch(error){
-    console.log(error, "Original error in googleAuth");
     throw new Error("Database error while google user authenticating")
   }
 }

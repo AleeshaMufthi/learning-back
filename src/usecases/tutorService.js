@@ -216,7 +216,6 @@ export const getTutorDetails = async (tutorId) => {
 export const updateTutorDetails = async (tutorDetails, file) => {
   const thumbnailUrl = await uploadImage(file)
   if(!thumbnailUrl){
-    console.log("Cloudinary upload failed");
     throw AppError.database("Error while uploading thumbnail")
   }
   const updatedTutorDetails = await updateDetailsById({

@@ -31,7 +31,6 @@ const instance = new Razorpay({
       const order = await instance.orders.create(options);
       return order;
     } catch (err) {
-      console.log(`Error happened at Razorpay on orderId : ${orderId}`, err);
       throw AppError.transaction(err.message);
     }
   };

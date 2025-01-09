@@ -7,30 +7,24 @@ const handleOrderPayment = async (orderId) => {
     try {
       // Step 1: Find the order and course details
       const order = await orderRepo.findOrderByCourseId(orderId);
-      console.log(order, 'order');
       
       if (!order) throw new Error("Order not found");
   
       const course = order.course;
-      console.log(course, 'course');
       
       const tutor = course.tutor;
-      console.log(tutor, 'tutor');
       
       const admin = await adminRepo.findAdmin();
-      console.log(admin, 'admin');
       
   
       if (!tutor || !admin) throw new Error("Tutor or Admin not found");
   
       // Step 2: Calculate revenue share
       const totalAmount = order.price;
-      console.log(totalAmount, 'totalAmount');
       
       const tutorShare = (totalAmount * 85) / 100; // 85% for tutor
       
       const adminShare = (totalAmount * 15) / 100; // 15% for admin
-      console.log(tutorShare, adminShare, 'sharesssss');
   
       // Step 3: Create a revenue record
       await revenueRepo.createRevenueRecord({
@@ -41,11 +35,9 @@ const handleOrderPayment = async (orderId) => {
         tutorRevenue: tutorShare,
         adminRevenue: adminShare,
       });
-     console.log('revenue record');
      
       // Step 4: Update tutor and admin balances
       await updateTutorBalance(tutor._id, tutorShare);
-      console.log('updateBalance');
       await adminRepo.updateAdminBalance(admin._id, adminShare);
       return { success: true, message: "Revenue distributed successfully." };
     } catch (error) {

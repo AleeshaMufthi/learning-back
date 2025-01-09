@@ -14,7 +14,6 @@ const errorHandler = (err, req, res, next) => {
         }
         return res.status(statusCode).json(responseData)
     }
-    console.log('error is',err)
     return res
     .status(StatusCodes.INTERNAL_SERVER_ERROR)
     .json({message: ReasonPhrases.INTERNAL_SERVER_ERROR})

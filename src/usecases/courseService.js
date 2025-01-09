@@ -9,7 +9,6 @@ export const courseCreate = async (file, value, tutor) => {
   const thumbnailUrl = await uploaded(value, file); // Upload the file to Cloudinary
 
   if (!thumbnailUrl) {
-    console.log('Cloudinary upload failed');
     
     throw AppError.database("Error while uploading media file");
   }

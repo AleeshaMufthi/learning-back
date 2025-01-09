@@ -8,7 +8,6 @@ export const findCoursesByUserId = async (userId) => {
     try {
     const user = await User.findById(userId).select("enrolledCourses").exec();
     if (!user || !user.enrolledCourses || user.enrolledCourses.length === 0) {
-        console.log("No enrolled courses found for this user");
         return []; 
     }
       return await Course.find({ 
@@ -62,7 +61,6 @@ export const findEnrolledStudents = async (courseId) => {
 
 
 export const getAllMessages = async (userId, tutorId) => {
-  console.log("Fetching messages for userId:", userId, "tutorId:", tutorId);
     const data = await Chat.find({
       $or: [
         { $and: [{ sender: userId.toString() }, { recipient: tutorId.toString() }] },

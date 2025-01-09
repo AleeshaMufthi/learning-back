@@ -3,7 +3,6 @@ import Category from "../model/categoryModel.js";
 
 export const getAllCategories = async () => {
     const categories = await Category.find({}, "-__v").catch((err) => {
-      console.log(err);
       throw AppError.database(err.message);
     });
     return categories;
@@ -12,10 +11,8 @@ export const getAllCategories = async () => {
   export const createCategory = async (newCategory) => {
     const category = new Category(newCategory);
     const response = await category.save().catch((err) => {
-      console.log(err);
       throw AppError.database(err.message);
     });
-    console.log("category created successfully - ", response.title);
     return response;
   };
 

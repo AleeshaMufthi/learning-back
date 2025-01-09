@@ -18,14 +18,12 @@ export const socketConfig = (server) => {
   // });
   
   io.on("connection", (socket) => {
-    console.log("Connected to socket server:", socket.id);
 
     socket.on('initiateCall', ({ userId, signalData, myId }) => {
       io.to(userId).emit('incomingCall', { signalData, from: myId });
     });
   
     socket.on('answerCall', (data) => {
-      console.log('Answer call received:', data);
       io.to(data.to).emit('callAccepted', data.signal);
     });
   
@@ -35,7 +33,6 @@ export const socketConfig = (server) => {
   
       // Handle disconnection
       socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
       });
   
 
@@ -43,25 +40,19 @@ export const socketConfig = (server) => {
 
       let roomId;
 
-      console.log(sender, 'sender from the socket');
       
-      console.log(instructor,' instructor from the socket') 
       
       if (sender && selectedInstructor) {
         // User Chat
         roomId = [sender.email, selectedInstructor.email].sort().join("-");
-        console.log(roomId, 'user roomid');
         socket.join(roomId);
         io.to(roomId).emit("userStatus", { email: sender.email, status: "online" });
-        console.log(`${sender.email} is online`);
         
       } else if (instructor && selectedStudent) {
         // Tutor Chat
         roomId = [instructor.email, selectedStudent.email].sort().join("-"); 
-        console.log(roomId, 'tutor roomid');
         socket.join(roomId);
         io.to(roomId).emit("userStatus", { email: instructor.email, status: "online" });
-        console.log(`${instructor.email} is online`);
       } else {
         console.error("Missing sender and recipient information for room.");
         return;
@@ -136,7 +127,6 @@ export const socketConfig = (server) => {
         to,
         toModel
       );
-      console.log("Notification saved to the database:", savedNotification);
       io.emit("newNotification", { Notification: savedNotification });
     });
     

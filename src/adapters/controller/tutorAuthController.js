@@ -12,7 +12,6 @@ import passwordSchema from "../../entities/passwordValidator.js";
 export const handleSignIn = asyncHandler(async (req, res) => {
   const { error, value } = signInSchema.validate(req.body);
   if (error) {
-    console.log(error);
     return res.status(400).json({ message: error.details[0].message });
   }
   const { tutorData, accessTokenTutor, refreshTokenTutor } =
@@ -28,7 +27,6 @@ export const handleSignUp = asyncHandler(async (req, res) => {
     throw AppError.validation(error.details[0].message);
   }
   const tutor = await tutorService.handleSignUp(value);
-  console.log("signed in");
   return res.status(200).json({ message: "Account created successfully" });
 });
 
@@ -96,9 +94,6 @@ export const restoreUserDetails = asyncHandler(async (req, res) => {
           refreshToken
         );
         attachTokenToCookie("accessTokenTutor", newAccessToken, res);
-
-        // const tutorData = await tutorService.getTutorFromToken(newAccessToken);
-        // console.log(tutorData, 'tutordataa');
 
         return res.status(200).json({ message: "Updated Access Token" });
       } catch (refreshErr) {

@@ -4,7 +4,6 @@ export const getAllNotificationsRepository = async () => {
     try {
       const notifications = await notificationModel.find()
         .sort({ createdAt: -1 }); // Sort notifications by newest first
-    console.log(notifications, 'notificationsssssssssssss from the repository layer...');
   
       return notifications;
     } catch (error) {

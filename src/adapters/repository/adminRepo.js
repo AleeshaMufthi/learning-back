@@ -53,7 +53,6 @@ export const createAdmin = ({ name, password, phone, email, adminname }) => {
       .save()
       .then((response) => response)
       .catch((error) => {
-        console.log("Error saving admin data to database - ", error);
         throw new AppError.database(
           "An error occured while processing your data"
         );

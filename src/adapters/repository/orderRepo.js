@@ -12,7 +12,6 @@ export const createOrder = async ({ userId, courseId, status, price }) => {
       .save()
       .then((response) => response)
       .catch((error) => {
-        console.log("Error while creating new order : ", error);
         throw AppError.database();
       });
   };

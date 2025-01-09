@@ -8,7 +8,6 @@ import attachTokenToCookie from "../../framework/web/utils/cookie.js";
 export const handleLogIn = asyncHandler(async (req, res) => {
     const { error, value } = signInSchema.validate(req.body);
     if (error) {
-      console.log(error);
       throw AppError.validation(error.details[0].message);
     }
     const { user, accessToken, refreshToken } = await userService.handleSignIn(
@@ -16,7 +15,6 @@ export const handleLogIn = asyncHandler(async (req, res) => {
     );
     attachTokenToCookie("accessToken", accessToken, res);
     attachTokenToCookie("refreshToken", refreshToken, res);
-    console.log("Login successful for user - ", user.name);
     res.status(200).json({ message: "Login successfull", user });
   });
 
@@ -26,14 +24,7 @@ export const handleRegister = asyncHandler(async (req, res) => {
     throw AppError.validation(error.details[0].message);
   }
   const user = await userService.handleSignUp(value);
-  console.log(
-    "New User has been registered -",
-    value.name,
-    "with email - ",
-    value.email,
-    "with phone number ",
-    value.phone
-  );
+
   return res.status(200).json({ message: "Account created successfully" });
   });
 

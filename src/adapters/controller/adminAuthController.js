@@ -8,7 +8,6 @@ import attachTokenToCookie from "../../framework/web/utils/cookie.js";
 export const handleSignIn = asyncHandler(async (req, res) => {
     const { error, value } = signInSchema.validate(req.body);
     if (error) {
-      console.log(error);
       return res.status(400).json({ message: error.details[0].message });
     }
     const { adminData, accessToken, refreshToken } =
@@ -24,7 +23,6 @@ export const handleSignIn = asyncHandler(async (req, res) => {
       throw AppError.validation(error.details[0].message);
     }
     const admin = await adminService.handleSignUp(value);
-    console.log("Admin signed in");
     return res.status(200).json({ message: "Account created successfully" });
   });
 

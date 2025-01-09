@@ -12,7 +12,6 @@ export const getAllNotificationsService = async () => {
 
 export const markAsRead = async (notificationId, userId) => {
     const notification = await notificationRepo.findById(notificationId);
-  console.log(notification, 'notification from markas read service');
   
     if (!notification) return null;
   
