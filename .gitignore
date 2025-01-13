@@ -1,10 +1,3 @@
 .env
 \node_modules
-src/usecases/cloudinaryImgService.js
-src/usecases/cloudinaryVideoService.js
-src/usecases/cloudinaryService.js
-src/adapters/middleware/userAuth.js
-src/framework/web/utils/appError.js
-src/adapters/router/index.js
-src/adapters/middleware/tutorAuth.js
-src/adapters/controller/userController.js
+

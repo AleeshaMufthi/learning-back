@@ -199,6 +199,7 @@ const getCoursesEnrolled = async (userId) => {
     },
     { $project: { details: 1 } },
   ]);
+  
   return coursesEnrolled[0].details;
 };
 

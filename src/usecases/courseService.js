@@ -63,9 +63,26 @@ export const addLessonToCourse = async (lessonId, courseId) => {
 };
 
 
-export const getAllCourses = async () => {
-  const courses = await courseRepository.getAllCourses();
+export const getAllCourses = async (query) => {
+  query.difficulty =
+  query.difficulty === "all"
+    ? ["beginner", "intermediate", "advanced", "expert"]
+    : query.difficulty.split(",");
+query.category =
+  query.category === "all"
+    ? await categoryRepository.getAllCategoriesTitle()
+    : query.category.split(",");
+query.sort = query.reqSort ? query.reqSort.split(",") : [query.sort];
+query.sortBy = {};
 
+if (query.sort[1]) {
+  query.sortBy[query.sort[0]] = query.sort[1];
+} else {
+  query.sortBy[query.sort[0]] = "asc";
+}
+  const courses = await courseRepository.getAllCourses(query);
+  const total = await courseRepository.getCountByFilter(query);
+ 
   for (let i = 0; i < courses.length; i++) {
     courses[i] = courses[i].toObject();
 
@@ -74,7 +91,7 @@ export const getAllCourses = async () => {
       secure: true, 
     });
   }
-  return courses;
+  return {courses, total}
 };
 
 
@@ -114,6 +131,7 @@ export const getAllCourseByFilter = async (query) => {
 
   return { total, courses: coursesWithURL };
 };
+
 export const getOneCourseDetials=async (courseId)=>{
   const course = await courseRepository.getCourse(courseId);
   return course
@@ -133,14 +151,12 @@ const isEnrolled = await enrollInCourseById({
 
 export const getEnrolledCourses = async (userId) => {  
   const coursesEnrolled = await getCoursesEnrolled(userId);
-  
   for (let i = 0; i < coursesEnrolled.length; i++) {
     coursesEnrolled[i].thumbnailURL = cloudinary.url(coursesEnrolled[i].thumbnail, {
       resource_type: "video" ? "video" : "image",
       secure: true, 
     });
   }  
-  
   return coursesEnrolled;
 };
 

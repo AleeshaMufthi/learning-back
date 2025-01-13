@@ -43,18 +43,17 @@ export const getAllCourses = async (req, res) => {
       category: req.query.category || "all",
       reqSort: req.query.sort,
     };
+    const {courses, total} = await courseService.getAllCourses(query);
     
-    
-    const courses= await courseService.getAllCourses();
     return res
       .status(200)
-      .json({ message: "Course found", data: courses });
+      .json({ message: "Course found", data: courses, total });
   };
 
   export const courseDetials=async(req,res)=>{
     const {id}=req.params
     const data=await courseService.getOneCourseDetials(id)
-    return res.status(200).json({message:"get course",data})
+    return res.status(200).json({message:"get course",data}) 
   }
 
   export const getSpecificCourse = async (req, res) => {

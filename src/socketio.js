@@ -4,18 +4,18 @@ import { saveNotificationToDatabase } from "./framework/web/utils/helper.js";
 import { getUserType } from "./framework/web/utils/socketHelpers.js";
 
 export const socketConfig = (server) => {
-  const io = new Server(server, {
-    cors: {
-      origin: "https://brain-booster.site",
-      methods: ["GET", "POST"],
-    },
-  });
   // const io = new Server(server, {
   //   cors: {
-  //     origin: "http://localhost:5173",
+  //     origin: "https://brain-booster.site",
   //     methods: ["GET", "POST"],
   //   },
   // });
+  const io = new Server(server, {
+    cors: {
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+    },
+  });
   
   io.on("connection", (socket) => {
 

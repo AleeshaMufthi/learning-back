@@ -35,7 +35,7 @@ export const createCourse = async (courseData, tutorId) => {
       const course = await Course.findOne({ _id: courseId })
         .populate("lessons")     // Populate the lessons field
         .populate("tutor"); // Populate the tutor's name field
-  
+      
       return course;
     } catch (err) {
       return null;  
@@ -50,13 +50,28 @@ export const createCourse = async (courseData, tutorId) => {
     return true;
   };
 
-  export const getAllCourses = async () => {
-    const courses = await Course.find({ lessons: { $exists: true, $ne: [] } })
+  export const getAllCourses = async (query) => {
+    const courses = await Course.find({
+      title: { $regex: query.search.trim(), $options: "i" },
+    })
+      .select("-__v") 
+      .sort(query.sortBy)
+      .skip(query.page * query.limit)
+      .limit(query.limit);
+  
     return courses;
   };
 
+  export const getCountByFilter = async ({ search, category, difficulty }) => {
+    const total = await Course.countDocuments();
+  
+    return total;
+  };
+  
+
   export const findCourseById = async (courseId) => {
     const course = await Course.findById({ _id: courseId }).select("-__v");
+    
     if (!course) {
       return false;
     }
@@ -77,15 +92,6 @@ export const createCourse = async (courseData, tutorId) => {
       .limit(query.limit);
   
     return courses;
-  };
-
-  export const getCountByFilter = async ({ search, category, difficulty }) => {
-    const total = await Course.countDocuments({
-      category: { $in: [...category] },
-      difficulty: { $in: [...difficulty] },
-      title: { $regex: search, $options: "i" },
-    });
-    return total;
   };
 
   export const getCourse=async(courseId)=>{
