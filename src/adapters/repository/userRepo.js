@@ -55,6 +55,20 @@ const findUserByUserId = async (userId) => {
   }
 };
 
+
+const ChangePasswordUpdate = async (userId, hashedPassword) => {
+  try {
+    return await userModel.findByIdAndUpdate(
+      userId,
+      { password: hashedPassword },
+      { new: true }
+    );
+  } catch (error) {
+    console.error("Error updating user password:", error);
+    throw new Error("Database error while updating password");
+  }
+};
+
 const checkIsBlocked = async (email) => {
   const user = await userModel.findOne({ email }).select({ isBlocked: 1 });
   return user.isBlocked;
@@ -91,12 +105,19 @@ const updatePassword = async ({ email, hashedPassword }) => {
     }
 };
 
-
-
-
-const getAllUser = async () => {
-  const users = await userModel.find();
-  return users;
+const getAllUser = async (query) => {
+  const page = query.page || 0;
+  const limit = query.limit || 5; 
+  const search = query.search.trim();
+  const users = await userModel.find({
+    name: { $regex: search, $options: "i" },
+  })
+  .skip(page * limit) // Skip for pagination
+  .limit(limit);
+   const total = await userModel.countDocuments({
+        name: { $regex: search, $options: "i" }, // Total count for matching search
+  });
+  return {users, total};
 };
 
 const blockUserById = async (_id) => {
@@ -109,22 +130,17 @@ const unblockUserById = async (_id) => {
   return isBlocked;
 };
 
-const updateDetailsById = async (user) => {
-  const { userDetails, thumbnail } = user;
-  const updateFields = {
-    name: userDetails.name,
-    age: userDetails.age,
-    about: userDetails.about,
-    address: userDetails.address,
-    visible: userDetails.visible,
-    thumbnail,
-  };
-  const updatedUser = await userModel.updateOne(
-    { _id: userDetails._id },
-    { $set: updateFields }
-  );
-  
-  return updatedUser;
+const updateDetailsById = async ({ id, updateFields }) => {
+  try {
+    const updatedDetails = await userModel.findByIdAndUpdate(id, updateFields, {
+      new: true,
+      runValidators: true,
+    });
+    return updatedDetails;
+  } catch (error) {
+    console.error("Database update failed:", error);
+    throw AppError.database("Failed to update user details: " + error.message);
+  }
 };
 
 const googleAuthUser = async (email, userInfo) => {
@@ -185,7 +201,27 @@ const enrollInCourseById = async ({ courseId, userId }) => {
   return userData;
 };
 
-const getCoursesEnrolled = async (userId) => {
+const getTotalEnrolledCount = async (userId, query) => {
+  // Filter for enrolled courses
+  const filter = {
+    _id: userId,
+    "enrolledCourses.title": { $regex: query.search, $options: "i" }, // Search by course title
+    "enrolledCourses.difficulty": { $in: query.difficulty },
+    "enrolledCourses.category": { $in: query.category },
+  };
+
+  const user = await userModel.findOne(filter).populate("enrolledCourses");
+  return user.enrolledCourses.length; // Total enrolled courses
+};
+
+const getCoursesEnrolled = async (userId, query) => {
+  const page = parseInt(query.page || 0); // Default to page 0 if not provided
+  const limit = parseInt(query.limit || 10); // Default limit to 10 if not provided
+  const search = query.search || ""; // Search filter for course titles
+  const sortField = query.sortField || "title"; // Default sort by title
+  const sortOrder = query.sortOrder === "desc" ? -1 : 1; // Ascending or Descending order
+
+  // Aggregation pipeline
   const coursesEnrolled = await userModel.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(userId) } },
     { $project: { enrolledCourses: 1, _id: 0 } },
@@ -197,11 +233,45 @@ const getCoursesEnrolled = async (userId) => {
         as: "details",
       },
     },
-    { $project: { details: 1 } },
+    { $unwind: "$details" }, // Unwind details for filtering and sorting
+    { 
+      $match: { 
+        "details.title": { $regex: search.trim(), $options: "i" }, // Search filter
+      },
+    },
+    { 
+      $sort: { [`details.${sortField}`]: sortOrder }, // Sort dynamically
+    },
+    { $skip: page * limit }, // Skip for pagination
+    { $limit: limit }, // Limit for pagination
   ]);
-  
-  return coursesEnrolled[0].details;
+
+  // Total count for pagination
+  const totalCourses = await userModel.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+    { $project: { enrolledCourses: 1, _id: 0 } },
+    {
+      $lookup: {
+        from: "courses",
+        localField: "enrolledCourses",
+        foreignField: "_id",
+        as: "details",
+      },
+    },
+    { $unwind: "$details" },
+    { 
+      $match: { 
+        "details.title": { $regex: search.trim(), $options: "i" }, 
+      },
+    },
+    { $count: "total" },
+  ]);
+
+  const total = totalCourses[0]?.total || 0;
+
+  return { courses: coursesEnrolled.map(item => item.details), total };
 };
+
 
 export {
   createUser,
@@ -221,4 +291,6 @@ export {
   findUserByCourseId,
   enrollInCourseById,
   getCoursesEnrolled,
+  getTotalEnrolledCount,
+  ChangePasswordUpdate,
 };

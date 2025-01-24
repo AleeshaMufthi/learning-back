@@ -5,7 +5,6 @@ import fetch from "node-fetch";
 import { v2 as cloudinary } from "cloudinary";
 
   export const addLessonToCourse = async (lesson) => {
-    const start = Date.now();
     const lessonKey = await uploadVideo(lesson);
     if (!lessonKey) {
       return false;

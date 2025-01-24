@@ -33,6 +33,7 @@ import {
 import emailOtp from "../framework/config/emailConnect.js";
 import { v2 as cloudinary } from "cloudinary";
 import uploadImage from "./cloudinaryImgService.js";
+import { query } from "express";
 
 export const handleSignIn = async ({ email, password }) => {
   let tutor = await findTutorByEmail(email);
@@ -183,9 +184,9 @@ export const checkTokenAndDelete = async (token) => {
   return isTokenPresent;
 };
 
-export const getAllTutors = async () => {
-  const tutors = await getAllTutor();
-  return tutors;
+export const getAllTutors = async (query) => {
+  const {tutors, total} = await getAllTutor(query);
+  return {tutors, total};
 };
 
 export const blockTutor = async (tutorId) => {

@@ -1,10 +1,13 @@
 import categoryRepository from "../adapters/repository/categoryRepo.js";
 
-export const getAllCategories = async () => {
-    const categories = await categoryRepository.getAllCategories();
-    if (!categories.length) {
-    }
-    return categories;
+export const getCategorys = async() => {
+  const category = await categoryRepository.getCategories()
+  return category
+}
+
+export const getAllCategories = async (query) => {
+    const {categories, total} = await categoryRepository.getAllCategories(query);
+    return {categories, total};
   };
   
 export const createCategory = async (newCategory) => {
@@ -33,4 +36,5 @@ export const createCategory = async (newCategory) => {
     createCategory,
     updateCategory,
     deleteCategory,
+    getCategorys,
   }

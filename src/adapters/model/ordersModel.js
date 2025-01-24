@@ -32,4 +32,4 @@ const ordersSchema = new Schema(
   
 const Orders = mongoose.model("orders", ordersSchema);
   
-  export default Orders
+export default Orders

@@ -1,5 +1,5 @@
 import { createOtp, updateOtp, findOtpByEmail } from '../adapters/repository/commonRepo.js'
-import {createUser, findUserByEmail, findUserByPhone, findUserByUserName, getAllUser, blockUserById, unblockUserById, findUserById, updateDetailsById, updatePassword, checkIsBlocked, googleAuthUser, getEnrolledCountById, findUserByCourseId, findUserByUserId } from '../adapters/repository/userRepo.js'
+import {createUser, findUserByEmail, findUserByPhone, findUserByUserName, getAllUser, blockUserById, unblockUserById, findUserById, updateDetailsById, updatePassword, checkIsBlocked, googleAuthUser, getEnrolledCountById, findUserByCourseId, findUserByUserId, ChangePasswordUpdate } from '../adapters/repository/userRepo.js'
 import emailOtp from '../framework/config/emailConnect.js'
 import AppError from '../framework/web/utils/appError.js'
 import { comparePasswords, createHashPassword } from '../framework/web/utils/bcrypt.js'
@@ -135,6 +135,34 @@ export const resetPassword = async ( email, newPassword ) => {
   }
 };
 
+
+export const changePassword = async (userId, currentPassword, newPassword) => {
+  // Fetch the user by ID
+  const user = await findUserById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  // Compare current password
+  console.log(currentPassword, 'current password');
+  console.log(user.password, '');
+  
+  
+  const isPasswordMatch = await comparePasswords(currentPassword, user.password);
+  console.log(isPasswordMatch, '-----------------------------------');
+  
+  if (!isPasswordMatch) {
+    throw new Error("Current password is incorrect");
+  }
+  // Hash the new password
+  const hashedPassword = await createHashPassword(newPassword);
+  // Update the user's password
+  const updatedUser = await ChangePasswordUpdate(userId, hashedPassword);
+  if (!updatedUser) {
+    throw new Error("Failed to update password");
+  }
+};
+
+
 export const getUserById = async(userId) => {
   return await findUserByUserId(userId)
 }
@@ -164,9 +192,9 @@ export const getAccessTokenByRefreshToken = async (refreshToken) => {
   }
 };
 
-export const getAllUsers = async () => {
-  const users = await getAllUser();
-  return users;
+export const getAllUsers = async (query) => {
+  const {users, total} = await getAllUser(query);
+  return {users, total};
 };
 
 export const blockUser = async (userId) => {
@@ -195,22 +223,37 @@ export const getUserDetails = async (userId) => {
   return userDetails;
 };
 
-export const updateUserDetails = async (userDetails, file) => {
-  
-  const thumbnailUrl = await uploadImage(file); // Upload the file to Cloudinary
+export const updateUserDetails = async ({ _id, thumbnail, ...fields }) => {
+  const updateFields = { ...fields };
 
-  if (!thumbnailUrl) {
-    
-    throw AppError.database("Error while uploading media file");
+  // Handle image upload if the thumbnail is provided
+  if (thumbnail) {
+    try {
+      const uploadedThumbnail = await uploadImage(thumbnail); // Upload the file to Cloudinary or any other service
+
+      if (!uploadedThumbnail) {
+        throw AppError.database("Error while uploading media file");
+      }
+
+      updateFields.thumbnail = uploadedThumbnail.url; // Assign the uploaded URL to the update fields
+    } catch (error) {
+      throw AppError.database("Error during image upload: " + error.message);
+    }
   }
 
+  // Update the user details in the database
   const updatedUserDetails = await updateDetailsById({
-    userDetails,
-    thumbnail: thumbnailUrl
+    id: _id,
+    updateFields,
+  });
+
+  if (!updatedUserDetails) {
+    throw AppError.database("Error while updating user details");
   }
-  );
+
   return updatedUserDetails;
 };
+
 
 export const googleAuthValidate = async( email, userInfo ) => {
   return await googleAuthUser(email, userInfo)
@@ -243,6 +286,7 @@ export const isEnrolledForCourse = async ({ courseId, userId }) => {
     getAccessTokenByRefreshToken,
     forgetPassword,
     resetPassword,
+    changePassword,
     getAllUsers,
     blockUser,
     unblockUser,

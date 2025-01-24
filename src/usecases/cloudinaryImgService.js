@@ -18,7 +18,6 @@ const uploadImage = async (file) => {
         if (!file || !file.buffer) {
             throw new Error("File is missing or invalid");
         }
-
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
         const fileName = `users/profile-${uniqueSuffix}`; // Organize images by user
 

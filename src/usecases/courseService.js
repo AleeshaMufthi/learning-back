@@ -2,7 +2,7 @@ import courseRepository from "../adapters/repository/courseRepo.js";
 import AppError from "../framework/web/utils/appError.js";
 import uploaded from '../usecases/cloudinaryService.js'
 import categoryRepository from "../adapters/repository/categoryRepo.js";
-import { enrollInCourseById, getCoursesEnrolled } from "../adapters/repository/userRepo.js";
+import { enrollInCourseById, getCoursesEnrolled, getTotalEnrolledCount } from "../adapters/repository/userRepo.js";
 import { v2 as cloudinary } from "cloudinary";
 
 export const courseCreate = async (file, value, tutor) => {
@@ -149,16 +149,35 @@ const isEnrolled = await enrollInCourseById({
   return isEnrolled;
 };
 
-export const getEnrolledCourses = async (userId) => {  
-  const coursesEnrolled = await getCoursesEnrolled(userId);
-  for (let i = 0; i < coursesEnrolled.length; i++) {
-    coursesEnrolled[i].thumbnailURL = cloudinary.url(coursesEnrolled[i].thumbnail, {
-      resource_type: "video" ? "video" : "image",
-      secure: true, 
-    });
-  }  
-  return coursesEnrolled;
+export const getEnrolledCourses = async (userId, query = {}) => {
+  query.difficulty =
+  query.difficulty === "all" ? ["beginner", "intermediate", "advanced", "expert"] : query.difficulty.split(",");
+
+  query.category =
+    query.category === "all"
+      ? await categoryRepository.getAllCategoriesTitle()
+      : query.category.split(",");
+
+  // Process sort options
+  const [sortField, sortOrder] = query.sort.split(",");
+  query.sortField = sortField;
+  query.sortOrder = sortOrder === "desc" ? -1 : 1;
+
+  const {courses, total} = await getCoursesEnrolled(userId, query);
+  
+
+  // Add Cloudinary URLs for thumbnails
+  const enrichedCourses = courses.map((course) => ({
+    ...course,
+    thumbnailURL: cloudinary.url(course.thumbnail, {
+      resource_type: course.thumbnail.includes(".mp4") ? "video" : "image",
+      secure: true,
+    }),
+  }));
+
+  return { courses: enrichedCourses, total };
 };
+
 
 export const getAllCourseCountByTutor = async (tutorId) => {
   const courses = await courseRepository.getCoursesCountByTutorId(tutorId);

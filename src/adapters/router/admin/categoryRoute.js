@@ -8,6 +8,9 @@ router.route("/")
       .get(categoryController.getAllCategories)
       .post(isAuthAdmin,categoryController.createCategory)
 
+router.route('/all')
+      .get(categoryController.getCategories)
+
 router.route("/:id")
       .put(isAuthAdmin, categoryController.updateCategory)
       .delete(isAuthAdmin, categoryController.deleteCategory); 

@@ -90,10 +90,21 @@ const findTutorByToken = async (email) => {
     return Tutor.isBlocked;
   };
 
-  const getAllTutor = async () => {
-    const tutors = await Tutor.find();
-    return tutors;
+  const getAllTutor = async (query) => {
+    const page = query.page || 0;
+    const limit = query.limit || 5; 
+    const search = query.search.trim();
+    const tutors = await Tutor.find({
+      name: { $regex: search, $options: "i" },
+    })
+    .skip(page * limit) // Skip for pagination
+    .limit(limit);
+    const total = await Tutor.countDocuments({
+      name: { $regex: search, $options: "i" }, // Total count for matching search
+    });
+    return {tutors, total};
   };
+
   const blockTutorById = async (_id) => {
     const isBlocked = await Tutor.updateOne({ _id }, { isBlocked: true });
     return isBlocked;

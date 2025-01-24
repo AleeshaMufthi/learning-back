@@ -37,12 +37,34 @@ export const createOrder = async ({ courseId, userId, user }) => {
     return isUpdated;
   };
 
-  export const getAllOrders = async (userId) => {
-    const orders = await orderRepository.findOrdersByUserId(userId);
-    if (!orders.length) {
-    }
-    return orders;
+  
+  export const getAllOrders = async (userId, query = {}) => {
+    const { page, limit, search, sort } = query;
+  
+    // Build the filter
+    const filter = {
+      user: userId,
+      ...(search && {
+        $or: [
+          { "course.title": { $regex: search, $options: "i" } }, // Search in course title
+          { "course.tagline": { $regex: search, $options: "i" } }, // Search in course tagline
+        ],
+      }),
+    };
+  
+    // Parse sort options
+    const [sortField, sortOrder] = sort.split(",");
+    const sortBy = { [sortField]: sortOrder === "desc" ? -1 : 1 };
+  
+    // Call repository to fetch orders and total count
+    return await orderRepository.findOrdersByUserId(filter, {
+      page,
+      limit,
+      sortBy,
+    });
   };
+  
+  
 
   export const cancelOrder = async (orderId) => {
     try {
@@ -53,11 +75,11 @@ export const createOrder = async ({ courseId, userId, user }) => {
       }
   
       // Check if the order is within 7 days
-      const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
+      const OneDaysInMs = 24 * 60 * 60 * 1000;
       const currentTime = new Date();
       const orderTime = new Date(order.createdAt);
       
-      if (currentTime - orderTime > fiveDaysInMs) {
+      if (currentTime - orderTime > OneDaysInMs) {
         throw new CustomError(400, "Cancellation period has expired( 5 days)");
       }
   

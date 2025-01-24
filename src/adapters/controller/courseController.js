@@ -44,7 +44,6 @@ export const getAllCourses = async (req, res) => {
       reqSort: req.query.sort,
     };
     const {courses, total} = await courseService.getAllCourses(query);
-    
     return res
       .status(200)
       .json({ message: "Course found", data: courses, total });
@@ -62,7 +61,6 @@ export const getAllCourses = async (req, res) => {
       req.params.id
     );
     course.totalStudentsEnrolled = totalStudentsEnrolled;
-    
     res.status(200).json({ message: "course Found", data: course });
   };
 
@@ -80,11 +78,31 @@ export const getAllCourses = async (req, res) => {
     });
   };
 
-  export const getEnrolledCourses = async (req, res) => {    
-    const enrolledCourses = await courseService.getEnrolledCourses(req.user._id);
-    
-    return res.status(200).json({ message: "success", data: enrolledCourses });
+  export const getEnrolledCourses = async (req, res) => {
+    try {
+      let query = {
+        page: parseInt(req.query.page) - 1 || 0, // Default to page 1
+        limit: parseInt(req.query.limit) || 3, // Default to 5 items per page
+        search: req.query.search || "", // Default to no search
+        difficulty: req.query.difficulty || "all", // Default to all difficulties
+        sort: req.query.sort || "createdAt, asc", // Default to sorting by createdAt (ascending)
+        category: req.query.category || "all", // Default to all categories
+      };
+  
+      // Pass query params and user ID to the service
+      const enrolledCourses = await courseService.getEnrolledCourses(req.user._id, query);
+      
+      return res.status(200).json({
+        message: "success",
+        data: enrolledCourses.courses,
+        total: enrolledCourses.total, 
+      });
+    } catch (error) {
+      console.error("Error in getEnrolledCourses:", error);
+      return res.status(500).json({ message: "Server error", error: error.message });
+    }
   };
+  
 
   export const enrollValidation = async (req, res, next) => {
     const params = {

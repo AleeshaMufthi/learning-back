@@ -5,8 +5,13 @@ import asyncHandler from "express-async-handler";
 import userService from "../../usecases/userService.js";
 
 export const getAllUsers = async (req, res) => {
-  const users = await userService.getAllUsers();
-  return res.status(200).json({ message: "users found", data: users });
+  let query = {
+    page: parseInt(req.query.page) - 1 || 0,
+    limit: parseInt(req.query.limit) || 5, 
+    search: req.query.search || "",
+  };
+  const {users, total} = await userService.getAllUsers(query);
+  return res.status(200).json({ message: "users found", data: users, total });
 };
 
 export const blockUser = async (req, res) => {
@@ -29,20 +34,46 @@ export const getUserDetails = asyncHandler(async (req, res) => {
     return res.status(200).json({ message: "user details found", userDetails });
   });
 
-export const updateUserDetails = asyncHandler(async (req, res) => {
+
+  export const updateUserDetails = asyncHandler(async (req, res) => {
+    console.log("File:", req.file); 
+    console.log("Body:", req.body); 
+
+    const updateData = {
+      ...req.body,
+      _id: req.user._id,
+    };
   
-    const { value, error } = userDetailsSchema.validate(req.body);
-    if (error) {
-      throw AppError.validation(error.details[0].message);
+    if (req.file) {
+      updateData.thumbnail = req.file; 
     }
-    const userData = await userService.updateUserDetails({
-      ...value,
-      _id: req.user._id }, req.file);
-    
+  
+    const userData = await userService.updateUserDetails(updateData);
+  
+    console.log(userData, "Updated User Data");
+
     res
       .status(200)
-      .json({ message: "user details updated successfully", data: userData });
+      .json({ message: "User details updated successfully", data: userData });
   });
+  
+
+export const handleChangePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    console.log(req.body, 'req.body');
+    
+    const userId = req.user._id; // Assumes `isAuthUser` middleware attaches `user` to the `req`
+
+    // Call the service to change the password
+    const data = await userService.changePassword(userId, currentPassword, newPassword);
+    return res.status(200).json({ message: "Password changed successfully", data });
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 
   export const checkCourseEnrolled = async (req, res) => {
     if (!req.user) {
@@ -69,6 +100,7 @@ export const updateUserDetails = asyncHandler(async (req, res) => {
     unblockUser,
     getUserDetails,
     updateUserDetails,
+    handleChangePassword,
     checkCourseEnrolled,
   }
 

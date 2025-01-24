@@ -1,11 +1,34 @@
 import AppError from "../../framework/web/utils/appError.js";
 import Category from "../model/categoryModel.js";
 
-export const getAllCategories = async () => {
-    const categories = await Category.find({}, "-__v").catch((err) => {
-      throw AppError.database(err.message);
-    });
-    return categories;
+export const getCategories = async() => {
+  const categories = await Category.find({}, "-__v").catch((err) => {
+    throw AppError.database(err.message);
+  });
+  return categories
+}
+
+export const getAllCategories = async (query) => {
+  console.log("Incoming query parameters:", query);
+  const page = query.page ?? 0;
+  const limit = query.limit || 5; 
+  const search = query.search.trim();
+ 
+  const filter = search
+  ? {
+      $or: [
+        { title: { $regex: search, $options: "i" } }, 
+        { description: { $regex: search, $options: "i" } },
+      ],
+    }
+  : {};
+  const categories = await Category.find(filter, "-__v")
+      .skip(page * limit) // Skip for pagination
+      .limit(limit);
+      const total = await Category.countDocuments(filter); 
+      console.log(categories,':categoriesssss');
+      console.log(total,':totall');
+    return {categories, total};
   };
 
   export const createCategory = async (newCategory) => {
@@ -17,7 +40,7 @@ export const getAllCategories = async () => {
   };
 
   export const getAllCategoriesTitle = async () => {
-    const categories = await getAllCategories();
+    const categories = await getCategories();
     const categoriesTitle = categories.map((category) => {
       return category.title;
     });
@@ -43,4 +66,5 @@ export const getAllCategories = async () => {
     findCategoryById,
     updateCategory,
     deleteCategory,
+    getCategories,
   }

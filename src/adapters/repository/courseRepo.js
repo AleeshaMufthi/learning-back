@@ -54,7 +54,9 @@ export const createCourse = async (courseData, tutorId) => {
     const courses = await Course.find({
       title: { $regex: query.search.trim(), $options: "i" },
     })
-      .select("-__v") 
+      .populate("tutor", "name") 
+      .populate("category", "name")
+      .select("-__v")
       .sort(query.sortBy)
       .skip(query.page * query.limit)
       .limit(query.limit);

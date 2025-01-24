@@ -5,9 +5,17 @@ import asyncHandler from "express-async-handler";
 import tutorService from "../../usecases/tutorService.js";
 
 export const getAllTutors = async (req, res) => {
-  const tutors = await tutorService.getAllTutors();
-  return res.status(200).json({ message: "tutors found", data: tutors });
+  let query = {
+    page: parseInt(req.query.page) - 1 || 0,
+    limit: parseInt(req.query.limit) || 5, 
+    search: req.query.search || "",
+  };
+  const {tutors, total} = await tutorService.getAllTutors(query);
+  console.log(tutors,'tutors', total,'total');
+  
+  return res.status(200).json({ message: "tutors found", data: tutors, total });
 };
+
 export const blockTutor = async (req, res) => {
     const isBlocked = await tutorService.blockTutor(req.body.userId);
     return res.status(200).json({ message: "Tutor Blocked Successfully" });

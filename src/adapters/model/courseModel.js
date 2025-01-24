@@ -39,6 +39,7 @@ const courseSchema = new Schema(
             default: true,
           },
           lessons: [{ type: Schema.Types.ObjectId, ref: "lessons" }],
+          quiz: [{ type: Schema.Types.ObjectId, ref: "Quiz"}],
     },{
         timestamps: true,
       }

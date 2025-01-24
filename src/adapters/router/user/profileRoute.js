@@ -16,6 +16,8 @@ router
   .all(isAuthUser)
   .post(upload.single("thumbnail"), userController.updateUserDetails);
 
+router.route("/changePassword").all(isAuthUser).post(userController.handleChangePassword)
+
 router
   .route("/enrolled/:id/check")
   .get(validateParams, isAuthUser, userController.checkCourseEnrolled);

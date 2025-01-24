@@ -16,13 +16,24 @@ export const createOrder = async ({ userId, courseId, status, price }) => {
       });
   };
 
+  
 export const updateOrderStatusById = async (_id, status) =>
     await Orders.findByIdAndUpdate({ _id }, { status });
 
-export const findOrdersByUserId = async (userId) =>
-    await Orders.find({ user: userId })
-      .select("-__v -updatedAt")
-      .populate("course", "title tagline price");
+
+export const findOrdersByUserId = async (filter, query) => {
+  const { page, limit, sortBy } = query;
+  const ordersQuery = Orders.find(filter)
+    .select("-__v -updatedAt")
+    .populate("course", "title tagline price")
+    .sort(sortBy)
+    .skip((page - 1) * limit)
+    .limit(limit);
+  const total = await Orders.countDocuments(filter); // Count based on the filter
+  const orders = await ordersQuery;
+  return { orders, total }; // Return both the orders and total count
+};
+
 
 export const findOrderById = async (orderId) => {
         try {

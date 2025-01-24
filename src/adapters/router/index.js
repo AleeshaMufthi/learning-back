@@ -9,12 +9,16 @@ import userWalletRoute from './user/walletRoute.js'
 import userChatRoute from './user/chatRoute.js'
 import userNotificationRoute from './user/notificationRoute.js'
 import userRevenueRoute from './user/revenueRoute.js'
+import userQuizRoute from './user/quizRoute.js'
+import userReviewRoute from './user/reviewRoute.js'
+import usercertificateRoute from './user/certificateRoute.js'
 
 import tutorDetailsRoute from './tutor/profileRoute.js'
 import tutorCourseRoute from './tutor/courseRoute.js'
 import tutorLessonRoute from './tutor/lessonRoute.js'
 import tutorChatRoute from './tutor/chatRoute.js'
 import tutorRevenueRoute from './tutor/revenueRoute.js'
+import tutorQuizRoute from './tutor/quizRoute.js'
 
 import adminUserRoute from './admin/usersRoute.js'
 import adminTutorRoute from './admin/TutorsRoute.js'
@@ -62,6 +66,18 @@ const defaultRoutes = [
        route: userRevenueRoute,
     },
     {
+       path: '/user/quiz',
+       route: userQuizRoute,
+    },
+    {
+        path: '/user/review',
+        route: userReviewRoute,
+     },
+     {
+        path: '/user/certificate',
+        route: usercertificateRoute,
+     },
+    {
         path: '/tutor/details',
         route: tutorDetailsRoute
     },
@@ -80,6 +96,9 @@ const defaultRoutes = [
     {
         path: "/tutor/revenue",
         route: tutorRevenueRoute,
+    },{
+        path: "/tutor/quiz",
+        route: tutorQuizRoute,
     },
     {
         path: '/admin/users',

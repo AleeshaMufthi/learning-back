@@ -43,10 +43,9 @@ app.use('*', (req, res) => {
 
   socketConfig(server)
 
-  // Global error handler
+// Global error handler
 app.use(errorHandler);
 
 server.listen(PORT, () => {
   console.log(`server starts running at http://localhost:${PORT}`);
-
 })

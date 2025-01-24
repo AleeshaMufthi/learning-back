@@ -3,8 +3,6 @@ import createLessonSchema from '../../entities/lessonValidator.js'
 
 export const addLessonToCourse = async (req, res) => {
 
-  const start = Date.now(); // Start timer
-
   const { value, error } = createLessonSchema.validate(req.body);
   console.log(req.body,"lesson creation")
   if (error)
