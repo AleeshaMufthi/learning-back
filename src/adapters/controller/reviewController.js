@@ -15,7 +15,7 @@ export const addReview = async (req, res) => {
 
 export const getReviews = async (req, res) => {
   const { courseId } = req.params;
-  const userId = req.user._id; // Assuming authentication middleware sets `req.user`
+  const userId = req.user._id; 
 
   try {
     // Get all reviews for the course

@@ -41,7 +41,7 @@ app.use('*', (req, res) => {
     res.status(404).json({ message: 'Not found' });
   });
 
-  socketConfig(server)
+socketConfig(server)
 
 // Global error handler
 app.use(errorHandler);
