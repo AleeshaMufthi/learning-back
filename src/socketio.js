@@ -6,7 +6,7 @@ import { getUserType } from "./framework/web/utils/socketHelpers.js";
 export const socketConfig = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "https://brain-booster.site",
+      origin: "https://learn.brain-booster.site",
       methods: ["GET", "POST"],
     },
   });
